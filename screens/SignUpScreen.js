@@ -4,9 +4,10 @@ import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { Input , Button } from 'react-native-elements';
 import { ScrollView } from 'react-native-gesture-handler';
+
 import { MonoText } from '../components/StyledText';
 
-export default function SignUpScreen() {
+export default function SIgnupScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.logo}></View>
@@ -47,7 +48,7 @@ export default function SignUpScreen() {
   );
 }
 
-SignUpScreen.navigationOptions = {
+SIgnupScreen.navigationOptions = {
   header: null,
 };
 
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
   },
   input_area : {
     flex: 5,
-    backgroundColor : "blue",
+    backgroundColor : "white",
     alignItems : "center",
     paddingLeft : "14.35%",
     paddingRight : "14.35%",
@@ -82,7 +83,8 @@ const styles = StyleSheet.create({
   forgotPassword_area : {
     flex: 4,
     backgroundColor : "purple",
-    alignItems : "center",
+    justifyContent : "center",
+    flexDirection : "row",
   },
   text_forgotPassword : {
     color : "white",

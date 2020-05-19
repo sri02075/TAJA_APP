@@ -6,7 +6,7 @@ import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import useCachedResources from './hooks/useCachedResources';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
-import SignUpScreen from './screens/signUpScreen';
+import SIgnupScreen from './screens/SIgnupScreen';
 const Stack = createStackNavigator();
 
 export default function App(props) {
@@ -22,8 +22,8 @@ export default function App(props) {
           <Stack.Navigator>
             <Stack.Screen name="Root" component={BottomTabNavigator} />
           </Stack.Navigator>
-        </NavigationContainer> */}
-        <SignUpScreen></SignUpScreen>
+        </NavigationContainer>  */}
+        <SIgnupScreen></SIgnupScreen>
       </View>
     );
   }
