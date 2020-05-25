@@ -11,7 +11,7 @@ export default function SIgnupScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.logo}></View>
-      <View style={styles.signUp_area}>
+      <View style={styles.title_area}>
         <Text style={styles.text_signUp}>SIGN UP</Text>
       </View>
       <View style={styles.input_area}>
@@ -19,19 +19,19 @@ export default function SIgnupScreen() {
           containerStyle={styles.input}
           placeholder='Email Address'
           errorStyle={{ color: 'red' }}
-          errorMessage='ENTER A VALID ERROR HERE'
+          errorMessage=''
         />
         <Input
           containerStyle={styles.input}
           placeholder='Password'
           errorStyle={{ color: 'red' }}
-          errorMessage='ENTER A VALID ERROR HERE'
+          errorMessage=''
         />
         <Input
           containerStyle={styles.input}
           placeholder='Confirm Password'
           errorStyle={{ color: 'red' }}
-          errorMessage='ENTER A VALID ERROR HERE'
+          errorMessage=''
         />
       </View>
       <View style={styles.button_area}>
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     flex: 4,
     backgroundColor : "red",
   },
-  signUp_area : {
+  title_area : {
     flex: 4,
     backgroundColor : "blue",
     justifyContent : "center",
