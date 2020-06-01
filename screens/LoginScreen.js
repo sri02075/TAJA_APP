@@ -7,6 +7,10 @@ import { Input , Button, withTheme } from 'react-native-elements';
 export default function LoginScreen() {
   return (
     <View style={styles.container}>
+      <Image
+          source={require('../assets/images/taja_logo.png')}
+          style={styles.logo_img}
+        />
       <View style={styles.title_area}>
         <Text style={styles.text_title}>반갑습니다 :)</Text>
         <Text style={styles.text_title}>안양 택시</Text>
@@ -117,5 +121,15 @@ const styles = StyleSheet.create({
     backgroundColor : "yellow",
     borderRadius : 8,
     height : 55,
+  },
+  logo_img : {
+    zIndex : -999,
+    opacity : 0.5,
+    position : "absolute",
+    resizeMode : 'contain',
+    width : '55%',
+    height : '60%',
+    marginLeft : '37%',
+    top : -10
   }
 });

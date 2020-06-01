@@ -10,7 +10,12 @@ import { MonoText } from '../components/StyledText';
 export default function SIgnupScreen() {
   return (
     <View style={styles.container}>
-      <View style={styles.logo_area}></View>
+      <View style={styles.logo_area}>
+        <Image
+          source={require('../assets/images/taja_logo.png')}
+          style={styles.logo_img}
+        />
+      </View>
       <View style={styles.title_area}>
         <Text style={styles.text_signUp}>SIGN UP</Text>
       </View>
@@ -78,30 +83,32 @@ const styles = StyleSheet.create({
   },
   logo_area : {
     flex: 5,
-    backgroundColor : "red",
+    /* backgroundColor : "blue", */
+    justifyContent : "flex-start",
+    alignItems : 'center',
   },
   title_area : {
     flex: 3,
-    backgroundColor : "blue",
+    /* backgroundColor : "blue", */
     justifyContent : "flex-start",
     alignItems : "center",
   },
   input_area : {
     flex: 5,
-    backgroundColor : "green",
+    /* backgroundColor : "green", */
     alignItems : "center",
     paddingLeft : "14.35%",
     paddingRight : "14.35%",
   },
   button_area : {
     flex: 2,
-    backgroundColor : "white",
+    /* backgroundColor : "white", */
     paddingLeft : "14.35%",
     paddingRight : "14.35%",
   },
   signIn_area : {
     flex: 4,
-    backgroundColor : "purple",
+    /* backgroundColor : "purple", */
     justifyContent : "center",
     flexDirection : "row",
   },
@@ -110,8 +117,10 @@ const styles = StyleSheet.create({
     fontSize : RFPercentage(1.4),
   },
   text_signUp : {
-    fontSize : RFPercentage(4),
-    color : "yellow",
+    fontSize : RFPercentage(5),
+    fontWeight : '600',
+    color : 'yellow',
+    letterSpacing : 2,
   },
   input_container : {
     width : "100%",
@@ -124,5 +133,11 @@ const styles = StyleSheet.create({
     height : 55,
     borderRadius : 8,
     backgroundColor : "yellow"
-  }
+  },
+  logo_img : {
+    width : '33%',
+    height : '33%',
+    resizeMode : 'contain',
+    marginTop : '30%'
+  },
 });
