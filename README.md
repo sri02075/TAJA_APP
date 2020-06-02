@@ -1,2 +1,2 @@
-# taja
+# TAJA
 taja application!
