@@ -8,6 +8,7 @@ import BottomTabNavigator from './navigation/BottomTabNavigator';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
 import SIgnupScreen from './screens/SIgnupScreen';
 import LoginScreen from './screens/LoginScreen';
+import ResetpwScreen from './screens/ResetpwScreen';
 const Stack = createStackNavigator();
 
 export default function App(props) {
@@ -24,7 +25,7 @@ export default function App(props) {
             <Stack.Screen name="Root" component={BottomTabNavigator} />
           </Stack.Navigator>
         </NavigationContainer>  */}
-        <LoginScreen></LoginScreen>
+        <SIgnupScreen></SIgnupScreen>
       </View>
     );
   }

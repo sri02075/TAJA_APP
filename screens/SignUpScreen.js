@@ -10,27 +10,50 @@ import { MonoText } from '../components/StyledText';
 export default function SIgnupScreen() {
   return (
     <View style={styles.container}>
-      <View style={styles.logo}></View>
+      <View style={styles.logo_area}>
+        <Image
+          source={require('../assets/images/taja_logo.png')}
+          style={styles.logo_img}
+        />
+      </View>
       <View style={styles.title_area}>
         <Text style={styles.text_signUp}>SIGN UP</Text>
       </View>
       <View style={styles.input_area}>
         <Input
-          containerStyle={styles.input}
+          containerStyle={styles.input_container}
+          inputStyle = {styles.input}
           placeholder='Email Address'
+          placeholderTextColor="#fff"
           errorStyle={{ color: 'red' }}
+          leftIcon={{ type: 'font-awesome',
+                      name: 'envelope', 
+                      color : 'white',
+                      size : 13 }}
           errorMessage=''
         />
         <Input
-          containerStyle={styles.input}
+          containerStyle={styles.input_container}
+          inputStyle = {styles.input}
           placeholder='Password'
+          placeholderTextColor="#fff"
           errorStyle={{ color: 'red' }}
+          leftIcon={{ type: 'font-awesome',
+                      name: 'lock', 
+                      color : 'white',
+                      size : 19 }}
           errorMessage=''
         />
         <Input
-          containerStyle={styles.input}
+          containerStyle={styles.input_container}
+          inputStyle = {styles.input}
           placeholder='Confirm Password'
+          placeholderTextColor="#fff"
           errorStyle={{ color: 'red' }}
+          leftIcon={{ type: 'font-awesome',
+                      name: 'lock', 
+                      color : 'white',
+                      size : 19 }}
           errorMessage=''
         />
       </View>
@@ -38,11 +61,12 @@ export default function SIgnupScreen() {
         <Button
           buttonStyle={styles.button}
           title="SIGN UP"
+          titleStyle={{color:'black',fontWeight : 'bold'}}
         />
       </View>
-      <View style={styles.forgotPassword_area}>
-        <Text style={styles.text_forgotPassword}>이미 계정이 있으신가요?</Text> 
-         <Text>SIGN_IN.</Text>
+      <View style={styles.signIn_area}>
+        <Text style={styles.text_signIn}>이미 계정이 있으신가요?  </Text> 
+         <Text style={{color:'yellow'}}>SIGN_IN.</Text>
       </View>
     </View>
   );
@@ -57,48 +81,63 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000',
   },
-  logo : {
-    flex: 4,
-    backgroundColor : "red",
+  logo_area : {
+    flex: 5,
+    /* backgroundColor : "blue", */
+    justifyContent : "flex-start",
+    alignItems : 'center',
   },
   title_area : {
-    flex: 4,
-    backgroundColor : "blue",
-    justifyContent : "center",
-    alignItems : "center"
+    flex: 3,
+    /* backgroundColor : "blue", */
+    justifyContent : "flex-start",
+    alignItems : "center",
   },
   input_area : {
     flex: 5,
-    backgroundColor : "white",
+    /* backgroundColor : "green", */
     alignItems : "center",
     paddingLeft : "14.35%",
     paddingRight : "14.35%",
   },
   button_area : {
     flex: 2,
-    backgroundColor : "yellow",
+    /* backgroundColor : "white", */
     paddingLeft : "14.35%",
     paddingRight : "14.35%",
   },
-  forgotPassword_area : {
+  signIn_area : {
     flex: 4,
-    backgroundColor : "purple",
+    /* backgroundColor : "purple", */
     justifyContent : "center",
     flexDirection : "row",
   },
-  text_forgotPassword : {
+  text_signIn : {
     color : "white",
-    fontSize : RFPercentage(2),
+    fontSize : RFPercentage(1.4),
   },
   text_signUp : {
-    fontSize : RFPercentage(4),
-    color : "yellow",
+    fontSize : RFPercentage(5),
+    fontWeight : '600',
+    color : 'yellow',
+    letterSpacing : 2,
   },
-  input : {
+  input_container : {
     width : "100%",
   },
+  input : {
+    color : "white",
+    paddingLeft : "10%",
+  },
   button : {
-    height : "90%",
+    height : 55,
     borderRadius : 8,
-  }
+    backgroundColor : "yellow"
+  },
+  logo_img : {
+    width : '33%',
+    height : '33%',
+    resizeMode : 'contain',
+    marginTop : '30%'
+  },
 });
