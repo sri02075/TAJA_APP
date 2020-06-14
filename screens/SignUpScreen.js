@@ -1,80 +1,95 @@
 import * as WebBrowser from 'expo-web-browser';
-import * as React from 'react';
+import React,{Component} from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { Input , Button } from 'react-native-elements';
-import { ScrollView } from 'react-native-gesture-handler';
 
-import { MonoText } from '../components/StyledText';
-
-export default function SIgnupScreen() {
-  return (
-    <View style={styles.container}>
-      <View style={styles.logo_area}>
-        <Image
-          source={require('../assets/images/taja_logo.png')}
-          style={styles.logo_img}
-        />
+export default class SIgnupScreen extends Component {
+  
+  componentDidMount(){
+    this.props.navigation.setOptions(header)
+  }
+  render(){
+    return (
+      <View style={styles.container}>
+        <View style={styles.logo_area}>
+          <Image
+            source={require('../assets/images/taja_logo.png')}
+            style={styles.logo_img}
+          />
+        </View>
+        <View style={styles.title_area}>
+          <Text style={styles.text_signUp}>SIGN UP</Text>
+        </View>
+        <View style={styles.input_area}>
+          <Input
+            containerStyle={styles.input_container}
+            inputStyle = {styles.input}
+            placeholder='Email Address'
+            placeholderTextColor="#fff"
+            errorStyle={{ color: 'red' }}
+            leftIcon={{ type: 'font-awesome',
+                        name: 'envelope', 
+                        color : 'white',
+                        size : 15 }}
+            errorMessage=''
+          />
+          <Input
+            containerStyle={styles.input_container}
+            inputStyle = {styles.input}
+            placeholder='Password'
+            placeholderTextColor="#fff"
+            errorStyle={{ color: 'red' }}
+            leftIcon={{ type: 'font-awesome',
+                        name: 'lock', 
+                        color : 'white',
+                        size : 19 }}
+            errorMessage=''
+          />
+          <Input
+            containerStyle={styles.input_container}
+            inputStyle = {styles.input}
+            placeholder='Confirm Password'
+            placeholderTextColor="#fff"
+            errorStyle={{ color: 'red' }}
+            leftIcon={{ type: 'font-awesome',
+                        name: 'lock', 
+                        color : 'white',
+                        size : 19 }}
+            errorMessage=''
+          />
+        </View>
+        <View style={styles.button_area}>
+          <Button
+            buttonStyle={styles.button}
+            title="SIGN UP"
+            titleStyle={{color:'black',fontWeight : 'bold'}}
+          />
+        </View>
+        <View style={styles.signIn_area}>
+          <Text style={styles.text_signIn}>이미 계정이 있으신가요?  </Text> 
+           <Text style={{color:'yellow'}}>SIGN_IN.</Text>
+        </View>
       </View>
-      <View style={styles.title_area}>
-        <Text style={styles.text_signUp}>SIGN UP</Text>
-      </View>
-      <View style={styles.input_area}>
-        <Input
-          containerStyle={styles.input_container}
-          inputStyle = {styles.input}
-          placeholder='Email Address'
-          placeholderTextColor="#fff"
-          errorStyle={{ color: 'red' }}
-          leftIcon={{ type: 'font-awesome',
-                      name: 'envelope', 
-                      color : 'white',
-                      size : 13 }}
-          errorMessage=''
-        />
-        <Input
-          containerStyle={styles.input_container}
-          inputStyle = {styles.input}
-          placeholder='Password'
-          placeholderTextColor="#fff"
-          errorStyle={{ color: 'red' }}
-          leftIcon={{ type: 'font-awesome',
-                      name: 'lock', 
-                      color : 'white',
-                      size : 19 }}
-          errorMessage=''
-        />
-        <Input
-          containerStyle={styles.input_container}
-          inputStyle = {styles.input}
-          placeholder='Confirm Password'
-          placeholderTextColor="#fff"
-          errorStyle={{ color: 'red' }}
-          leftIcon={{ type: 'font-awesome',
-                      name: 'lock', 
-                      color : 'white',
-                      size : 19 }}
-          errorMessage=''
-        />
-      </View>
-      <View style={styles.button_area}>
-        <Button
-          buttonStyle={styles.button}
-          title="SIGN UP"
-          titleStyle={{color:'black',fontWeight : 'bold'}}
-        />
-      </View>
-      <View style={styles.signIn_area}>
-        <Text style={styles.text_signIn}>이미 계정이 있으신가요?  </Text> 
-         <Text style={{color:'yellow'}}>SIGN_IN.</Text>
-      </View>
-    </View>
-  );
+    );
+  }
 }
 
-SIgnupScreen.navigationOptions = {
-  header: null,
-};
+const header = {
+  title: '',
+  headerStyle: {
+    backgroundColor: '#000',
+    elevation: 0,
+    shadowOpacity: 0,
+    borderBottomWidth: 0,
+  },
+  headerTintColor: 'white',
+  headerTitleStyle: {
+    fontWeight: 'bold',
+    marginLeft : 10,
+  },
+  
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -82,7 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   logo_area : {
-    flex: 5,
+    flex: 2,
     /* backgroundColor : "blue", */
     justifyContent : "flex-start",
     alignItems : 'center',
@@ -103,8 +118,8 @@ const styles = StyleSheet.create({
   button_area : {
     flex: 2,
     /* backgroundColor : "white", */
-    paddingLeft : "14.35%",
-    paddingRight : "14.35%",
+    paddingLeft : "16.35%",
+    paddingRight : "16.35%",
   },
   signIn_area : {
     flex: 4,
@@ -121,6 +136,7 @@ const styles = StyleSheet.create({
     fontWeight : '600',
     color : 'yellow',
     letterSpacing : 2,
+    paddingTop : "11%",
   },
   input_container : {
     width : "100%",
@@ -135,9 +151,9 @@ const styles = StyleSheet.create({
     backgroundColor : "yellow"
   },
   logo_img : {
-    width : '33%',
-    height : '33%',
+    width : '80%',
+    height : '80%',
     resizeMode : 'contain',
-    marginTop : '30%'
+    marginTop : "6%"
   },
 });

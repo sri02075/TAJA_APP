@@ -6,7 +6,7 @@ import { Platform, StatusBar, StyleSheet, View } from 'react-native';
 import useCachedResources from './hooks/useCachedResources';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
-import SIgnupScreen from './screens/SIgnupScreen';
+import SignUpScreen from './screens/SignUpScreen';
 import LoginScreen from './screens/LoginScreen';
 import ResetpwScreen from './screens/ResetpwScreen';
 const Stack = createStackNavigator();
@@ -20,17 +20,31 @@ export default function App(props) {
     return (
       <View style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="dark-content" />}
-        {/* <NavigationContainer linking={LinkingConfiguration}>
-          <Stack.Navigator>
-            <Stack.Screen name="Root" component={BottomTabNavigator} />
+        <NavigationContainer linking={LinkingConfiguration}>
+          <Stack.Navigator
+             initialRouteName="Login"
+          >
+            <Stack.Screen name="Login"component={LoginScreen} /* options={headerOption}  *//>
+            <Stack.Screen name="SignUp" component={SignUpScreen} />
+            <Stack.Screen name="ResetPw" component={ResetpwScreen} />
+            <Stack.Screen name="Test" component={BottomTabNavigator} />
           </Stack.Navigator>
-        </NavigationContainer>  */}
-        <SIgnupScreen></SIgnupScreen>
+        </NavigationContainer> 
+        {/* <SIgnupScreen></SIgnupScreen> */}
       </View>
     );
   }
 }
-
+const headerOption = {
+  title: 'My home',
+  headerStyle: {
+    backgroundColor: '#fff',
+  },
+  headerTintColor: 'white',
+  headerTitleStyle: {
+    fontWeight: 'bold',
+  },
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,
