@@ -1,5 +1,5 @@
 import React,{Component} from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Platform, StyleSheet,PixelRatio, Text, TouchableOpacity, View } from 'react-native';
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
 import { Input , Button, withTheme } from 'react-native-elements';
 import { StackActions, NavigationActions } from 'react-navigation';
@@ -26,7 +26,12 @@ export default class LoginScreen extends Component {
     
     const inputData = this.state;
     if(inputData.id !== '' && inputData.password !== ''){
-      const loginCheck = 'success'
+      let loginCheck 
+      if(inputData.id === 't' && inputData.password === 't'){
+        loginCheck = 'success'
+       }else{
+        loginCheck = 'fail' 
+       }
       //const loginCheck = await api.get('/login')
       if(loginCheck === 'success'){
         this.props.navigation.navigate('Test')
@@ -35,6 +40,7 @@ export default class LoginScreen extends Component {
       }
     }else{
       alert('아이디와 비밀번호를 입력해주세요')
+      
     }
     //this.props.navigation.navigate('Test')
   }
@@ -133,7 +139,7 @@ const styles = StyleSheet.create({
     justifyContent : "flex-end",
     paddingBottom : "4%",
     alignItems : "flex-start",
-    paddingLeft : "14.35%"
+    paddingLeft : "14.35%",
   },
   input_area : {
     flex : 5,
@@ -189,9 +195,9 @@ const styles = StyleSheet.create({
     opacity : 0.5,
     position : "absolute",
     resizeMode : 'contain',
-    width : '55%',
-    height : '60%',
+    width : 200 ,
+    height : 300 ,
     marginLeft : '37%',
-    top : '-10%'
+    top : 0
   }
 });

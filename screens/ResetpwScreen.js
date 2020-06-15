@@ -1,4 +1,3 @@
-import * as WebBrowser from 'expo-web-browser';
 import React,{Component} from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";

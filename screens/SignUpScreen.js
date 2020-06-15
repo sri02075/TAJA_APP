@@ -1,4 +1,3 @@
-import * as WebBrowser from 'expo-web-browser';
 import React,{Component} from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
@@ -67,8 +66,15 @@ export default class SIgnupScreen extends Component {
           />
         </View>
         <View style={styles.signIn_area}>
-          <Text style={styles.text_signIn}>이미 계정이 있으신가요?  </Text> 
-           <Text style={{color:'yellow'}}>SIGN_IN.</Text>
+          <Text style={styles.text_signIn}>이미 계정이 있으신가요? </Text>
+          <TouchableOpacity>
+            <Text 
+              style={{color:'yellow'}}
+              onPress={() => this.props.navigation.pop()}
+            >
+              SIGN_IN.
+            </Text>
+          </TouchableOpacity> 
         </View>
       </View>
     );
