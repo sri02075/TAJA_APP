@@ -24,7 +24,7 @@ export default class ResetpwScreen extends Component {
             containerStyle={styles.input_container}
             inputStyle = {styles.input}
             placeholder='Email Address'
-            placeholderTextColor="#fff" 
+            placeholderTextColor="#fff"
             errorStyle={{ color: 'red' }}
             leftIcon={{ type: 'font-awesome', name: 'envelope', color : 'white' }}
             errorMessage=''
@@ -36,6 +36,7 @@ export default class ResetpwScreen extends Component {
             buttonStyle={styles.button}
             title="SEND"
             titleStyle = {{color : 'black',fontWeight : 'bold'}}
+            onPress={()=>alert('미구현 기능입니다\n관리자에게 문의하세요')}
           />
         </View>
       </View>

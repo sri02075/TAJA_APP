@@ -1,13 +1,44 @@
-import React,{Component} from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { Input , Button } from 'react-native-elements';
+import React,{Component} from 'react'
+import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { RFPercentage, RFValue } from "react-native-responsive-fontsize"
+import { Input , Button } from 'react-native-elements'
+//import Toast from 'react-native-simple-toast'
+import axios from 'axios'
 
 export default class SIgnupScreen extends Component {
-  
-  componentDidMount(){
-    this.props.navigation.setOptions(header)
-  }
+    constructor(props){
+        super(props)
+            this.state = {
+                formData: {
+                    email: '',
+                    nickname: '',
+                    password: '',
+                    password_confirm : '',
+                }
+        }
+    }
+    componentDidMount(){
+        this.props.navigation.setOptions(header)
+    }
+
+    async handleSignIn(){
+        const {email,nickname,password,password_confirm} = this.state.formData
+        console.log(this.state.formData)
+        console.log(`${email} / ${nickname} / ${password}`)
+        if(!email || !nickname || !password || !password_confirm){
+            alert('정보를 입력해주세요')
+            return
+        }
+        if(password !== password_confirm){
+          alert('비밀번호가 일치하지 않습니다.')
+          return
+        }
+        const user = axios.post(
+            'https://api.taja.awmaker.com/user',
+            this.state.formData
+        )
+        this.props.navigation.pop()
+}
   render(){
     return (
       <View style={styles.container}>
@@ -28,10 +59,30 @@ export default class SIgnupScreen extends Component {
             placeholderTextColor="#fff"
             errorStyle={{ color: 'red' }}
             leftIcon={{ type: 'font-awesome',
-                        name: 'envelope', 
+                        name: 'envelope',
                         color : 'white',
                         size : 15 }}
             errorMessage=''
+            onChangeText={value => this.setState(state=>{
+                state.formData.email = value
+                return state
+            })}
+          />
+          <Input
+            containerStyle={styles.input_container}
+            inputStyle = {styles.input}
+            placeholder='nickname'
+            placeholderTextColor="#fff"
+            errorStyle={{ color: 'red' }}
+            leftIcon={{ type: 'font-awesome',
+                        name: 'user-o',
+                        color : 'white',
+                        size : 15 }}
+            errorMessage=''
+            onChangeText={value => this.setState(state=>{
+                state.formData.nickname = value
+                return state
+            })}
           />
           <Input
             containerStyle={styles.input_container}
@@ -40,10 +91,15 @@ export default class SIgnupScreen extends Component {
             placeholderTextColor="#fff"
             errorStyle={{ color: 'red' }}
             leftIcon={{ type: 'font-awesome',
-                        name: 'lock', 
+                        name: 'lock',
                         color : 'white',
                         size : 19 }}
             errorMessage=''
+            secureTextEntry={true}
+            onChangeText={value => this.setState(state=>{
+                state.formData.password = value
+                return state
+            })}
           />
           <Input
             containerStyle={styles.input_container}
@@ -52,10 +108,15 @@ export default class SIgnupScreen extends Component {
             placeholderTextColor="#fff"
             errorStyle={{ color: 'red' }}
             leftIcon={{ type: 'font-awesome',
-                        name: 'lock', 
+                        name: 'lock',
                         color : 'white',
                         size : 19 }}
             errorMessage=''
+            secureTextEntry={true}
+            onChangeText={value => this.setState(state=>{
+                state.formData.password_confirm = value
+                return state
+            })}
           />
         </View>
         <View style={styles.button_area}>
@@ -63,21 +124,22 @@ export default class SIgnupScreen extends Component {
             buttonStyle={styles.button}
             title="SIGN UP"
             titleStyle={{color:'black',fontWeight : 'bold'}}
+            onPress ={()=>this.handleSignIn()}
           />
         </View>
         <View style={styles.signIn_area}>
           <Text style={styles.text_signIn}>이미 계정이 있으신가요? </Text>
           <TouchableOpacity>
-            <Text 
+            <Text
               style={{color:'yellow'}}
               onPress={() => this.props.navigation.pop()}
             >
               SIGN_IN.
             </Text>
-          </TouchableOpacity> 
+          </TouchableOpacity>
         </View>
       </View>
-    );
+    )
   }
 }
 
@@ -115,7 +177,7 @@ const styles = StyleSheet.create({
     alignItems : "center",
   },
   input_area : {
-    flex: 5,
+    flex: 7,
     /* backgroundColor : "green", */
     alignItems : "center",
     paddingLeft : "14.35%",
@@ -128,7 +190,7 @@ const styles = StyleSheet.create({
     paddingRight : "16.35%",
   },
   signIn_area : {
-    flex: 4,
+    flex: 2,
     /* backgroundColor : "purple", */
     justifyContent : "center",
     flexDirection : "row",
@@ -162,4 +224,4 @@ const styles = StyleSheet.create({
     resizeMode : 'contain',
     marginTop : "6%"
   },
-});
+})
