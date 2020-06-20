@@ -8,10 +8,11 @@ import LinkingConfiguration from './navigation/LinkingConfiguration';
 import SignUpScreen from './screens/SignUpScreen';
 import LoginScreen from './screens/LoginScreen';
 import ResetpwScreen from './screens/ResetpwScreen';
+import deviceStorage from './deviceStorage.js';
 const Stack = createStackNavigator();
 
 export default function App(props) {
-    const [token,setToken] = useState('');
+    const [token,setToken] = useState('test');
     const isLoadingComplete = useCachedResources();
 
     const updateToken = (token)=>{
@@ -27,7 +28,7 @@ export default function App(props) {
             <Stack.Navigator
                 initialRouteName="Login"
             >
-                <Stack.Screen name="Login" component={LoginScreen} /* options={headerOption}  *//>
+                <Stack.Screen name="Login" component={LoginScreen} options={headerOption} />
                 <Stack.Screen name="SignUp" component={SignUpScreen} />
                 <Stack.Screen name="ResetPw" component={ResetpwScreen} />
                 <Stack.Screen name="Test" component={BottomTabNavigator} />

@@ -3,6 +3,8 @@ import { Image, Platform, StyleSheet,PixelRatio, Text, TouchableOpacity, View } 
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize"
 import { Input , Button, withTheme } from 'react-native-elements'
 import axios from 'axios'
+import deviceStorage from '../deviceStorage.js';
+
 export default class LoginScreen extends Component {
     constructor(props) {
         super(props)
@@ -10,6 +12,19 @@ export default class LoginScreen extends Component {
             email : '',
             password : '',
         }
+        /*jwt check function*/
+        const checkJWT = async () => {
+            try {
+                const token = await deviceStorage.getItem('JWT')
+                if(token){
+                    //api()
+                    this.props.navigation.navigate('Test')
+                }
+            }catch(err){
+                console.log(err)
+            }
+        }
+        checkJWT()
     }
     componentDidMount() {
         /* const resetAction = StackActions.reset({
@@ -20,14 +35,15 @@ export default class LoginScreen extends Component {
         this.props.navigation.setOptions(header)
     }
     async loginUser() {
-        console.log('before'+this.props.token)
         const inputData = this.state
         if(inputData.email !== '' && inputData.password !== ''){
             const response = await this.loginCheck()
             const {result,success} = response.data
             if(success){
-                this.props.updateToken(result.token)
-                console.log('after'+this.props.token)
+                //alert(result.token)
+                //await deviceStorage.saveItem('JWT', result.token)
+                const token = await deviceStorage.getItem('JWT')
+                alert(token)
                 //this.props.navigation.navigate('Test')
             }else{
                 alert('아이디와 비밀번호를 확인해주세요')
@@ -118,7 +134,7 @@ export default class LoginScreen extends Component {
 const header = {
     title: '',
     headerStyle: {
-        backgroundColor: '#000',
+        backgroundColor: '#0d1f37',
         elevation: 0,
         shadowOpacity: 0,
         borderBottomWidth: 0,
@@ -132,7 +148,7 @@ const header = {
     const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
+        backgroundColor: '#0d1f37',
     },
     title_area : {
         flex : 6,
@@ -177,7 +193,7 @@ const header = {
     input_wrapper : {
         flex : 3,
         justifyContent : "flex-end",
-    },  
+    },
     input_container : {
         width : "100%",
     },
@@ -186,7 +202,7 @@ const header = {
         paddingLeft : "10%",
     },
     button : {
-        backgroundColor : "yellow",
+        backgroundColor : "#ffb000",
         borderRadius : 8,
         height : 55,
     },

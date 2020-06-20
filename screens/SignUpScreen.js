@@ -19,6 +19,7 @@ export default class SIgnupScreen extends Component {
     }
     componentDidMount(){
         this.props.navigation.setOptions(header)
+        console.log(this.props.navigation)
     }
 
     async handleSignIn(){
@@ -33,10 +34,14 @@ export default class SIgnupScreen extends Component {
           alert('비밀번호가 일치하지 않습니다.')
           return
         }
-        const user = axios.post(
+        const response = await axios.post(
             'https://api.taja.awmaker.com/user',
             this.state.formData
         )
+        if(!response.data.success){
+          alert(response.data.errorString)
+          return
+        }
         this.props.navigation.pop()
 }
   render(){
@@ -146,7 +151,7 @@ export default class SIgnupScreen extends Component {
 const header = {
   title: '',
   headerStyle: {
-    backgroundColor: '#000',
+    backgroundColor: '#0d1f37',
     elevation: 0,
     shadowOpacity: 0,
     borderBottomWidth: 0,
@@ -162,7 +167,7 @@ const header = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#0d1f37',
   },
   logo_area : {
     flex: 2,

@@ -47,7 +47,7 @@ export default class ResetpwScreen extends Component {
 const header = {
   title: '',
   headerStyle: {
-    backgroundColor: '#000',
+    backgroundColor: '#0d1f37',
     elevation: 0,
     shadowOpacity: 0,
     borderBottomWidth: 0,
@@ -61,7 +61,7 @@ const header = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#0d1f37',
   },
   logo_area : {
     flex : 3,
