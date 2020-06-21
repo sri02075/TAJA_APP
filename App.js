@@ -1,14 +1,15 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import React,{useState}  from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
+import { Platform, StatusBar, StyleSheet, View ,Keyboard } from 'react-native';
 import useCachedResources from './hooks/useCachedResources';
-import BottomTabNavigator from './navigation/BottomTabNavigator';
+import MainTabNavigator from './navigation/MainTabNavigator';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
 import SignUpScreen from './screens/SignUpScreen';
 import LoginScreen from './screens/LoginScreen';
 import ResetpwScreen from './screens/ResetpwScreen';
 import deviceStorage from './deviceStorage.js';
+
 const Stack = createStackNavigator();
 
 export default function App(props) {
@@ -31,7 +32,7 @@ export default function App(props) {
                 <Stack.Screen name="Login" component={LoginScreen} options={headerOption} />
                 <Stack.Screen name="SignUp" component={SignUpScreen} />
                 <Stack.Screen name="ResetPw" component={ResetpwScreen} />
-                <Stack.Screen name="Test" component={BottomTabNavigator} />
+                <Stack.Screen name="Test" component={MainTabNavigator} />
             </Stack.Navigator>
             </NavigationContainer>
             {/* <SIgnupScreen></SIgnupScreen> */}

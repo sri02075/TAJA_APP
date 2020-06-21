@@ -1,5 +1,5 @@
 import React,{Component} from 'react'
-import { Image, Platform, StyleSheet,PixelRatio, Text, TouchableOpacity, View } from 'react-native'
+import { Image, Platform, StyleSheet,PixelRatio, Text, TouchableOpacity, View ,ScrollView ,Keyboard} from 'react-native'
 import { RFPercentage, RFValue } from "react-native-responsive-fontsize"
 import { Input , Button, withTheme } from 'react-native-elements'
 import axios from 'axios'
@@ -18,13 +18,14 @@ export default class LoginScreen extends Component {
                 const token = await deviceStorage.getItem('JWT')
                 if(token){
                     //api()
-                    this.props.navigation.navigate('Test')
+                    //this.props.navigation.navigate('Test')
                 }
             }catch(err){
                 console.log(err)
             }
         }
         checkJWT()
+        
     }
     componentDidMount() {
         /* const resetAction = StackActions.reset({
@@ -48,6 +49,9 @@ export default class LoginScreen extends Component {
             }else{
                 alert('아이디와 비밀번호를 확인해주세요')
             }
+        }else{
+            this.props.navigation.navigate('Test')
+            //alert('이메일과 패스워드를 입력해주세요')
         }
     }
     async loginCheck() {
@@ -63,70 +67,72 @@ export default class LoginScreen extends Component {
     }
     render() {
         return (
-        <View style={styles.container}>
-            <Image
-                source={require('../assets/images/taja_logo.png')}
-                style={styles.logo_img}
-            />
-            <View style={styles.title_area}>
-            <Text style={styles.text_title}>반갑습니다 :)</Text>
-            <Text style={styles.text_title}>안양 택시</Text>
-            <Text style={styles.text_title}>같이 탈래요?</Text>
-            </View>
-            <View style={styles.input_area}>
-            <View style={styles.input_wrapper}>
-                <Input
-                    containerStyle={styles.input_container}
-                    inputStyle = {styles.input}
-                    placeholder='Email Address'
-                    placeholderTextColor="#fff"
-                    errorStyle={{ color: 'red' }}
-                    leftIcon={{ type: 'font-awesome', name: 'envelope', color : 'white' }}
-                    errorMessage=''
-                    onChangeText={value => this.setState({ email : value })}
+            <View style={styles.container}>
+                {/* <ScrollView style={{flex: 1}} keyboardShouldPersistTaps="always"> */}
+                <Image
+                    source={require('../assets/images/taja_logo.png')}
+                    style={styles.logo_img}
                 />
-                <Input
-                    containerStyle={styles.input_container}
-                    inputStyle = {styles.input}
-                    placeholder='Password'
-                    placeholderTextColor="#fff"
-                    errorStyle={{ color: 'red' }}
-                    leftIcon={{ type: 'font-awesome', name: 'lock',color : 'white' }}
-                    errorMessage=''
-                    secureTextEntry={true}
-                    onChangeText={value => this.setState({ password : value })}
+                <View style={styles.title_area }>
+                    <Text style={styles.text_title}>반갑습니다 :)</Text>
+                    <Text style={styles.text_title}>안양 택시</Text>
+                    <Text style={styles.text_title}>같이 탈래요?</Text>
+                </View>
+                <View style={styles.input_area}>
+                    <View style={styles.input_wrapper}>
+                    <Input
+                        containerStyle={styles.input_container}
+                        inputStyle = {styles.input}
+                        placeholder='Email Address'
+                        placeholderTextColor="#fff"
+                        errorStyle={{ color: 'red' }}
+                        leftIcon={{ type: 'font-awesome', name: 'envelope', color : 'white',size : 15 }}
+                        errorMessage=''
+                        onChangeText={value => this.setState({ email : value })}
+                    />
+                    <Input
+                        containerStyle={styles.input_container}
+                        inputStyle = {styles.input}
+                        placeholder='Password'
+                        placeholderTextColor="#fff"
+                        errorStyle={{ color: 'red' }}
+                        leftIcon={{ type: 'font-awesome', name: 'lock',color : 'white' ,size : 19 }}
+                        errorMessage=''
+                        secureTextEntry={true}
+                        onChangeText={value => this.setState({ password : value })}
+                    />
+                    </View>
+                    <View style={styles.help_wrapper}>
+                    <View style={styles.help_create}>
+                    <TouchableOpacity>
+                        <Text style={styles.text_help}
+                        onPress={() => this.props.navigation.navigate('SignUp')}
+                        >
+                        계정을 생성하시겠어요?
+                        </Text>
+                    </TouchableOpacity>
+                    </View>
+                    <View style={styles.help_forgot}>
+                    <TouchableOpacity>
+                        <Text style={styles.text_help}
+                        onPress={() => this.props.navigation.navigate('ResetPw')}
+                        >
+                        비밀번호를 잊으셨나요?
+                        </Text>
+                    </TouchableOpacity>
+                    </View>
+                    </View>
+                </View>
+                <View style={styles.button_area}>
+                <Button
+                    buttonStyle={styles.button}
+                    title="SIGN IN"
+                    titleStyle = {{color : 'black',fontWeight : 'bold'}}
+                    onPress={() => this.loginUser()}
                 />
                 </View>
-                <View style={styles.help_wrapper}>
-                <View style={styles.help_create}>
-                <TouchableOpacity>
-                    <Text style={styles.text_help}
-                    onPress={() => this.props.navigation.navigate('SignUp')}
-                    >
-                    계정을 생성하시겠어요?
-                    </Text>
-                </TouchableOpacity>
-                </View>
-                <View style={styles.help_forgot}>
-                <TouchableOpacity>
-                    <Text style={styles.text_help}
-                    onPress={() => this.props.navigation.navigate('ResetPw')}
-                    >
-                    비밀번호를 잊으셨나요?
-                    </Text>
-                </TouchableOpacity>
-                </View>
-                </View>
+                {/* </ScrollView> */}
             </View>
-            <View style={styles.button_area}>
-            <Button
-                buttonStyle={styles.button}
-                title="SIGN IN"
-                titleStyle = {{color : 'black',fontWeight : 'bold'}}
-                onPress={() => this.loginUser()}
-            />
-            </View>
-        </View>
         )
     }
 }
@@ -157,17 +163,21 @@ const header = {
         paddingBottom : "4%",
         alignItems : "flex-start",
         paddingLeft : "14.35%",
+        minHeight :250,
     },
     input_area : {
         flex : 5,
         /* backgroundColor : "blue", */
         paddingLeft : "14.35%",
         paddingRight : "14.35%",
+        minHeight : 200,
+        marginTop : "5%"
     },
     button_area : {
         flex : 6,
         paddingLeft : "19.35%",
         paddingRight : "19.35%",
+        minHeight : 250,
     },
     text_title : {
         fontSize : RFPercentage(4.7),
@@ -198,8 +208,10 @@ const header = {
         width : "100%",
     },
     input : {
+        flex : 1,
         color : "white",
         paddingLeft : "10%",
+        fontSize : RFPercentage(1.7),
     },
     button : {
         backgroundColor : "#ffb000",
@@ -208,12 +220,12 @@ const header = {
     },
     logo_img : {
         zIndex : -999,
-        opacity : 0.5,
+        opacity : 0.3,
         position : "absolute",
         resizeMode : 'contain',
         width : 200 ,
         height : 300 ,
         marginLeft : '37%',
-        top : 0
+        top : -14
     }
-    })
+})
