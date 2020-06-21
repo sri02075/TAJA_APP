@@ -7,6 +7,7 @@ import MainTabNavigator from './navigation/MainTabNavigator';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
 import SignUpScreen from './screens/SignUpScreen';
 import LoginScreen from './screens/LoginScreen';
+import HomeScreen from './screens/HomeScreen';
 import ResetpwScreen from './screens/ResetpwScreen';
 import deviceStorage from './deviceStorage.js';
 
@@ -32,10 +33,9 @@ export default function App(props) {
                 <Stack.Screen name="Login" component={LoginScreen} options={headerOption} />
                 <Stack.Screen name="SignUp" component={SignUpScreen} />
                 <Stack.Screen name="ResetPw" component={ResetpwScreen} />
-                <Stack.Screen name="Test" component={MainTabNavigator} />
+                <Stack.Screen name="Home" component={HomeScreen} />
             </Stack.Navigator>
             </NavigationContainer>
-            {/* <SIgnupScreen></SIgnupScreen> */}
         </View>
         );
     }

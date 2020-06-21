@@ -49,7 +49,7 @@ export default class LoginScreen extends Component {
                 alert('아이디와 비밀번호를 확인해주세요')
             }
         }else{
-            this.props.navigation.navigate('Test')
+            this.props.navigation.navigate('Home')
             //alert('이메일과 패스워드를 입력해주세요')
         }
     }

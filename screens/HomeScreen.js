@@ -42,13 +42,34 @@ export default class HomeScreen extends React.Component {
                             color="white"
                         />
                         }
-                    type="Clear"
                     buttonStyle={styles.button}
                     containerStyle={styles.button_container}
                     title=""
                     titleStyle = {{color : 'black',fontWeight : 'bold'}}
                     onPress={() => this.handleRefresh()}
                 />
+                <View style={styles.bottom_area}>
+                        <View style={styles.logo_wrapper}></View>
+                        <View style={{flex:4}}></View>
+                        <View style={styles.create_chat_wrapper}>
+                            <TouchableOpacity style={{flex:1,alignContent:'center'}} onPress={()=>alert('z')}>
+                                <Icon
+                                    name="arrow-right"
+                                    size={48}
+                                    color="white"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.profile_wrapper}>
+                            <TouchableOpacity onPress={() => this.props.navigation.navigate('ResetPw')}>
+                                <Icon
+                                    name="arrow-right"
+                                    size={48}
+                                    color="white"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                </View>
             </View>
         )
     }
@@ -91,6 +112,15 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#fff',
+    },
+    bottom_area: {
+        height: 48,
+        width: "100%",
+        zIndex: 999,
+        backgroundColor:'red',
+        position : "fixed",
+        bottom: 0,
+        flexDirection : 'row'
     },
     row: {
         height : 100,
@@ -144,8 +174,19 @@ const styles = StyleSheet.create({
         width: 50,
         zIndex : 999,
         position : "absolute",
-        resizeMode : 'contain',
         right: 0,
-        bottom: 0,
+        bottom: 100,
+    },
+    logo_wrapper: {
+        flex:1,
+        backgroundColor: 'green',
+    },
+    create_chat_wrapper: {
+        flex:1,
+        backgroundColor: 'blue',
+    },
+    profile_wrapper: {
+        flex:1,
+        backgroundColor: 'yellow',
     }
 });
