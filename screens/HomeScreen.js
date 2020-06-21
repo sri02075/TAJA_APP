@@ -7,6 +7,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { ScrollView } from 'react-native-gesture-handler';
 import Modal from 'react-native-modal';
 import Select from 'react-native-picker-select';
+import SendBird from 'sendbird'
 
 export default class HomeScreen extends React.Component {
     constructor(props){
@@ -17,28 +18,73 @@ export default class HomeScreen extends React.Component {
             appearKeyboard  : false,
             selectedStartLocation : '',
             selectedEndLocation : '',
+            selectedTime : '09:00 AM',
+            chattingRoomList2 : [],
+            userName : '익명이'
         }
+        this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
+        this.sb.connect(this.state.userName, (user, error) => {})
     }
 
-    renderChattingRooms(ChattingRoomList){
-        return ChattingRoomList.map((el,idx)=>
-            <ChattingRoom key={idx} />
-            )
+    componentDidMount() {
+        this.handleRefresh()
     }
 
-    async handleRefresh(){
-        //await api response
-        const ChattingRoomList = [1,2]
-        this.setState({ChattingRoomList})
+    createChattingRoom() {
+        const data = {
+            adminName : this.state.userName,
+            startTime : 'START_TIME',
+            startLocation : 'START_LOCATION',
+            arriveLocation : 'ARRIVE_LOCATION'
+        }
+        const This = this
+        this.sb.OpenChannel.createChannel("타이틀", "", JSON.stringify(data), [] ,'', (openChannel, error) => {
+            if (error) {
+                return;
+            }
+            This.handleRefresh()
+            This.toggleModal()
+        })
     }
+
+    renderChattingRooms(chattingRoomList){
+        return chattingRoomList.map((channel,idx)=>{
+            const info = JSON.parse(channel.data)
+            const channelData = {
+                userName : this.state.userName,
+                url : channel.url,
+                startTime : info.startTime,
+                startLocation : info.startLocation,
+                arriveLocation : info.arriveLocation
+            }
+            return <ChattingRoom key={idx} channelData={channelData} me={this} />
+        })
+    }
+
+    handleRefresh(){
+        let openChannelListQuery = this.sb.OpenChannel.createOpenChannelListQuery();
+        const This = this
+        
+        openChannelListQuery.next(function(openChannels, error) {
+            if (error) {
+                return;
+            }
+            
+            This.setState({
+                chattingRoomList2 : openChannels
+            })
+        })
+    }
+    
     toggleModal = () => {
         this.setState({isModalVisible: !this.state.isModalVisible})
     }
+
     render(){
         return (
             <View style={styles.container}>
                 <ScrollView>
-                    {this.renderChattingRooms(this.state.ChattingRoomList)}
+                    {this.renderChattingRooms(this.state.chattingRoomList2)}
                 </ScrollView>
                 <Button
                     icon={
@@ -92,8 +138,8 @@ export default class HomeScreen extends React.Component {
                                             </View>
                                             <View style={styles.modal_time_area}>
                                                 <View style={styles.modal_button_area}>
-                                                    <Button style={{flex:1}} title="Hide Modal" onPress={this.toggleModal} />
-                                                    <Button style={{flex:1}} title="create chat" onPress={this.toggleModal} />
+                                                    <Button style={{flex:1}} title="Hide Modal" onPress={this.toggleModal.bind(this)} />
+                                                    <Button style={{flex:1}} title="create chat" onPress={this.createChattingRoom.bind(this)} />
                                                 </View>
                                             </View>
                                         </View>
@@ -116,33 +162,41 @@ export default class HomeScreen extends React.Component {
     }
 }
 
-function ChattingRoom(props){
-    return(
-        <View style={styles.row}>
-            <TouchableOpacity style={styles.row_wrapper}>
-                <View style={styles.icon_area}>
-                </View>
-                <View style={styles.description_area}>
-                    <View style={{flex:1}}></View>
-                    <View style={styles.description}>
-                        <Text style={styles.text_description_title}>출발 </Text>
-                        <Text style={styles.text_description}> 안양역 1호선</Text>
+class ChattingRoom extends React.Component {
+    constructor(props){
+        super(props)
+        this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
+        this.sb.connect('익명이', (user, error) => {})
+    }
+
+    render() {
+        return(
+            <View style={styles.row}>
+                <TouchableOpacity style={styles.row_wrapper} onPress={() => this.props.me.props.navigation.navigate('Chat', this.props.channelData)}>
+                    <View style={styles.icon_area}>
                     </View>
-                    <View style={styles.description}>
-                        <Text style={styles.text_description_title}>도착 </Text>
-                        <Text style={styles.text_description}> 안양대학교 후문</Text>
+                    <View style={styles.description_area}>
+                        <View style={{flex:1}}></View>
+                        <View style={styles.description}>
+                            <Text style={styles.text_description_title}>출발 </Text>
+                            <Text style={styles.text_description}>{this.props.channelData.startLocation}</Text>
+                        </View>
+                        <View style={styles.description}>
+                            <Text style={styles.text_description_title}>도착 </Text>
+                            <Text style={styles.text_description}>{this.props.channelData.arriveLocation}</Text>
+                        </View>
+                        <View style={{flex:1}}></View>
                     </View>
-                    <View style={{flex:1}}></View>
-                </View>
-                <View style={styles.time_area}>
-                    <View style={styles.time_wrapper}>
-                        <Text style={{color:'red'}}>5분전</Text>
-                        <Text style={{color:'gray'}}>오전 8:50</Text>
+                    <View style={styles.time_area}>
+                        <View style={styles.time_wrapper}>
+                            <Text style={{color:'red'}}>5분전</Text>
+                            <Text style={{color:'gray'}}>{this.props.channelData.startTime}</Text>
+                        </View>
                     </View>
-                </View>
-            </TouchableOpacity>
-        </View>
-    )
+                </TouchableOpacity>
+            </View>
+        )
+    }
 }
 HomeScreen.navigationOptions = {
     header: null,
