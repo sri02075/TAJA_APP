@@ -25,8 +25,8 @@ export default {
         ResetPw : 'ResetPw'
       } */
     },
-    Test : {
-      path : 'test'
+    Home : {
+      path : 'home'
     }
   },
 };
