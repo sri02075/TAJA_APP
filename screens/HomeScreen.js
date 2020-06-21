@@ -5,15 +5,16 @@ import { RFPercentage, RFValue } from "react-native-responsive-fontsize"
 import { Button } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ScrollView } from 'react-native-gesture-handler';
+import Modal from 'react-native-modal';
 
 export default class HomeScreen extends React.Component {
     constructor(props){
         super(props)
         this.state = {
             ChattingRoomList : [1,2,3,4,5,6,7],
+            isModalVisible : false,
             appearKeyboard  : false,
         }
-        
     }
 
     renderChattingRooms(ChattingRoomList){
@@ -27,7 +28,9 @@ export default class HomeScreen extends React.Component {
         const ChattingRoomList = [1,2]
         this.setState({ChattingRoomList})
     }
-
+    toggleModal = () => {
+        this.setState({isModalVisible: !this.state.isModalVisible})
+    }
     render(){
         return (
             <View style={styles.container}>
@@ -52,12 +55,18 @@ export default class HomeScreen extends React.Component {
                         <View style={styles.logo_wrapper}></View>
                         <View style={{flex:4}}></View>
                         <View style={styles.create_chat_wrapper}>
-                            <TouchableOpacity style={{flex:1,alignContent:'center'}} onPress={()=>alert('z')}>
+                            <TouchableOpacity style={{flex:1,alignContent:'center'}} onPress={()=>this.setState({isModalVisible:true})}>
                                 <Icon
                                     name="arrow-right"
                                     size={48}
                                     color="white"
                                 />
+                                <Modal isVisible={this.state.isModalVisible}>
+                                    <View style={{flex: 1}}>
+                                        <Text>Hello!</Text>
+                                        <Button title="Hide modal" onPress={this.toggleModal} />
+                                    </View>
+                                </Modal>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.profile_wrapper}>
@@ -116,9 +125,7 @@ const styles = StyleSheet.create({
     bottom_area: {
         height: 48,
         width: "100%",
-        zIndex: 999,
         backgroundColor:'red',
-        position : "fixed",
         bottom: 0,
         flexDirection : 'row'
     },
