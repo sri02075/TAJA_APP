@@ -5,7 +5,7 @@ import { Input , Button } from 'react-native-elements'
 //import Toast from 'react-native-simple-toast'
 import axios from 'axios'
 
-export default class SIgnupScreen extends Component {
+export default class SignupScreen extends Component {
     constructor(props){
         super(props)
         this.state = {

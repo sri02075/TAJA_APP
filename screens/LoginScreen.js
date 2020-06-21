@@ -25,7 +25,6 @@ export default class LoginScreen extends Component {
             }
         }
         checkJWT()
-        
     }
     componentDidMount() {
         /* const resetAction = StackActions.reset({
