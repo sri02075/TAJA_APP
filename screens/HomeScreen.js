@@ -6,6 +6,7 @@ import { Button } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ScrollView } from 'react-native-gesture-handler';
 import Modal from 'react-native-modal';
+import Select from 'react-native-picker-select';
 
 export default class HomeScreen extends React.Component {
     constructor(props){
@@ -14,6 +15,8 @@ export default class HomeScreen extends React.Component {
             ChattingRoomList : [1,2,3,4,5,6,7],
             isModalVisible : false,
             appearKeyboard  : false,
+            selectedStartLocation : '',
+            selectedEndLocation : '',
         }
     }
 
@@ -62,9 +65,38 @@ export default class HomeScreen extends React.Component {
                                     color="white"
                                 />
                                 <Modal isVisible={this.state.isModalVisible}>
-                                    <View style={{flex: 1}}>
-                                        <Text>Hello!</Text>
-                                        <Button title="Hide modal" onPress={this.toggleModal} />
+                                    <View style={styles.modal_wrapper}>
+                                        <View style={{height:400,backgroundColor:'red'}}>
+                                            <View style={styles.modal_title_area}>
+                                                <Text>새로운 동행</Text>
+                                            </View>
+                                            <View style={styles.modal_location_area}>
+                                                <Select
+                                                    onValueChange={(value) => this.setState({selectedStartLocation : value})}
+                                                    placeholder={{ label: '출발장소',value :null}}
+                                                    items={[
+                                                        { label: '안양역', value: '안양역' },
+                                                        { label: '안양대 정문', value: '안양대 정문' },
+                                                        { label: '안양대 후문', value: '안양대 후문' },
+                                                    ]}
+                                                />
+                                                <Select
+                                                    onValueChange={(value) => this.setState({selectedEndLocation : value})}
+                                                    placeholder={{label: '도착장소'}}
+                                                    items={[
+                                                        { label: '안양대 정문', value: '안양대 정문' },
+                                                        { label: '안양대 후문', value: '안양대 후문' },
+                                                        { label: '안양역', value: '안양역' },
+                                                    ]}
+                                                />
+                                            </View>
+                                            <View style={styles.modal_time_area}>
+                                                <View style={styles.modal_button_area}>
+                                                    <Button style={{flex:1}} title="Hide Modal" onPress={this.toggleModal} />
+                                                    <Button style={{flex:1}} title="create chat" onPress={this.toggleModal} />
+                                                </View>
+                                            </View>
+                                        </View>
                                     </View>
                                 </Modal>
                             </TouchableOpacity>
@@ -128,6 +160,24 @@ const styles = StyleSheet.create({
         backgroundColor:'red',
         bottom: 0,
         flexDirection : 'row'
+    },
+    modal_title_area: {
+        flex:4,
+        backgroundColor:"green",
+    },
+    modal_location_area: {
+        flex:5,
+        backgroundColor:"yellow",
+    },
+    modal_time_area: {
+        flex:9,
+        backgroundColor:"blue",
+    },
+    modal_button_area: {
+        flex:3,
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
     },
     row: {
         height : 100,
@@ -195,5 +245,12 @@ const styles = StyleSheet.create({
     profile_wrapper: {
         flex:1,
         backgroundColor: 'yellow',
+    },
+    modal_wrapper: {
+        flex:1,
+        paddingTop: 100,
+        paddingLeft : "10.18%",
+        paddingRight : "10.18%",
+        borderRadius : 100,
     }
 });
