@@ -5,6 +5,7 @@ import { RFPercentage, RFValue } from "react-native-responsive-fontsize"
 import { Button } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ScrollView } from 'react-native-gesture-handler';
+import SendBird from 'sendbird'
 
 export default class HomeScreen extends React.Component {
     constructor(props){
@@ -13,7 +14,8 @@ export default class HomeScreen extends React.Component {
             ChattingRoomList : [1,2,3,4,5,6,7],
             appearKeyboard  : false,
         }
-        
+        this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
+        this.sb.connect('익명이', )
     }
 
     renderChattingRooms(ChattingRoomList){
