@@ -1,7 +1,6 @@
-import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
 import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize"
+import {RFValue } from "react-native-responsive-fontsize"
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ScrollView } from 'react-native-gesture-handler';
 import Modal from 'react-native-modal';
@@ -54,7 +53,7 @@ export default class ChatScreen extends React.Component {
                 return;
             }
         
-            const lastMessage = openChannel.createPreviousMessageListQuery()  
+            const lastMessage = openChannel.createPreviousMessageListQuery()
             lastMessage.limit = 1
 
             lastMessage.load(function(message, error) {
@@ -79,7 +78,6 @@ export default class ChatScreen extends React.Component {
         })
     }
 
-    
     enterChat(value) {
         const This = this
         const params = new this.sb.UserMessageParams()
@@ -106,21 +104,21 @@ export default class ChatScreen extends React.Component {
     }
 
     renderChat() {
-        return this.state.chatHistory.map(chat => <ChatContent name={chat.name} contents={chat.contents} />)
+        return this.state.chatHistory.map((chat,idx) => <ChatContent key={idx} name={chat.name} contents={chat.contents} />)
     }
 
     render(){
         return (
-            <View>
-                <ScrollView>
+            <View style={styles.container}>
+                <ScrollView syle={{transform: [{ scaleY: -1 }]}}>
                     <View>{this.renderChat()}</View>
                 </ScrollView>
                 <View>
                     {/* <Button value="나가기" onClick={this.exit} /> */}
-                    <Input 
+                    <Input
                         onChangeText={value => this.setState({ inputChat : value })}
                         onSubmitEditing={this.enterChat.bind(this)}
-                     />
+                    />
                 </View>
             </View>
         )
@@ -133,7 +131,18 @@ class ChatContent extends React.Component {
     }
     render() {
         return(
-            <Text>{this.props.name}: {this.props.contents}</Text>
+            <View style={styles.chatContent_area}>
+                <View style={styles.icon_wrapper}></View>
+                <View style={styles.contents_wrapper}>
+                    <View style={styles.nickname_wrapper}>
+                        <Text style={styles.text_nickname}>{this.props.name}</Text>
+                    </View>
+                    <View style={styles.chat_wrapper}>
+                            <Text style={styles.text_chat}>{this.props.contents}</Text>
+                    </View>
+                </View>
+                <View style={styles.time_wrapper}></View>
+            </View>
         )
     }
 }
@@ -143,11 +152,51 @@ ChatScreen.navigationOptions = {
 };
 
 
-// const styles = StyleSheet.create({
-//     container: {
-//         flex: 1,
-//         backgroundColor: '#fff',
-//     },
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: '#0d1f37',
+    },
+    chatContent_area: {
+        overflow : "visible",
+        backgroundColor: 'red',
+        flexDirection: 'row',
+        borderBottomColor: 'black',
+        borderWidth: 1,
+        alignItems: 'stretch'
+    },
+    icon_wrapper: {
+        flex: 2,
+        backgroundColor: "blue",
+    },
+    contents_wrapper: {
+        flex: 6,
+        backgroundColor: "green",
+        alignItems: 'stretch',
+    },
+    time_wrapper: {
+        flex: 2,
+        backgroundColor: "yellow",
+    },
+    nickname_wrapper: {
+        flex: 2,
+    },
+    chat_wrapper: {
+        flex: 2,
+        backgroundColor: 'white',
+        borderRadius: 5,
+        padding: 10,
+        justifyContent: 'center',
+        alignItems: 'stretch',
+    },
+    text_chat: {
+        fontSize: RFValue(16),
+        backgroundColor: 'red',
+    },
+    text_nickname: {
+        fontSize: RFValue(16),
+        color: 'white',
+    }
 //     bottom_area: {
 //         height: 48,
 //         width: "100%",
@@ -247,4 +296,4 @@ ChatScreen.navigationOptions = {
 //         paddingRight : "10.18%",
 //         borderRadius : 100,
 //     }
-// });
+});

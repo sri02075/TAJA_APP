@@ -14,11 +14,13 @@ export default class HomeScreen extends React.Component {
         super(props)
         this.state = {
             ChattingRoomList : [1,2,3,4,5,6,7],
-            isModalVisible : false,
+            ModalCreateChatVisible : false,
+            ModalEnterChatVisible : false,
             appearKeyboard  : false,
             selectedStartLocation : '',
             selectedEndLocation : '',
             selectedTime : '09:00 AM',
+            selectedChattingRoom : {},
             chattingRoomList2 : [],
             userName : '익명이'
         }
@@ -29,13 +31,26 @@ export default class HomeScreen extends React.Component {
     componentDidMount() {
         this.handleRefresh()
     }
+    selectStartLocation(location) {
+        this.setState({selectedStartLocation:location})
+    }
 
+    selectEndLocation(location) {
+        this.setState({selectedEndLocation:location})
+    }
+
+    handlePressList(channelData){
+        this.setState({
+            ModalEnterChatVisible : !this.state.ModalEnterChatVisible,
+            selectedChattingRoom : channelData,
+        })
+    }
     createChattingRoom() {
         const data = {
             adminName : this.state.userName,
-            startTime : 'START_TIME',
-            startLocation : 'START_LOCATION',
-            arriveLocation : 'ARRIVE_LOCATION'
+            startTime : '09:00 AM',
+            startLocation : this.state.selectedStartLocation,
+            arriveLocation : this.state.selectedEndLocation,
         }
         const This = this
         this.sb.OpenChannel.createChannel("타이틀", "", JSON.stringify(data), [] ,'', (openChannel, error) => {
@@ -43,8 +58,13 @@ export default class HomeScreen extends React.Component {
                 return;
             }
             This.handleRefresh()
-            This.toggleModal()
+            This.toggleModalCreateChat()
         })
+    }
+
+    enterChattingRoom(){
+        this.setState({ModalEnterChatVisible : !this.state.ModalEnterChatVisible})
+        this.props.navigation.navigate('Chat', this.state.selectedChattingRoom)
     }
 
     renderChattingRooms(chattingRoomList){
@@ -57,7 +77,7 @@ export default class HomeScreen extends React.Component {
                 startLocation : info.startLocation,
                 arriveLocation : info.arriveLocation
             }
-            return <ChattingRoom key={idx} channelData={channelData} me={this} />
+            return <ChattingRoom key={idx} channelData={channelData} handlePressList={(channelData)=>this.handlePressList(channelData)} />
         })
     }
 
@@ -73,10 +93,14 @@ export default class HomeScreen extends React.Component {
             })
         })
     }
-    toggleModal = () => {
-        this.setState({isModalVisible: !this.state.isModalVisible})
+
+    toggleModalCreateChat = () => {
+        this.setState({ModalCreateChatVisible: !this.state.ModalCreateChatVisible})
     }
 
+    toggleModalEnterChat = () => {
+        this.setState({ModalEnterChatVisible: !this.state.ModalEnterChatVisible})
+    }
     render(){
         return (
             <View style={styles.container}>
@@ -97,69 +121,38 @@ export default class HomeScreen extends React.Component {
                     titleStyle = {{color : 'black',fontWeight : 'bold'}}
                     onPress={() => this.handleRefresh()}
                 />
+                <ModalEnterChat
+                    ModalEnterChatVisible={this.state.ModalEnterChatVisible}
+                    toggleModalEnterChat={()=>this.toggleModalEnterChat()}
+                    enterChattingRoom={()=>this.enterChattingRoom()}/>
                 <View style={styles.bottom_area}>
-                        <View style={styles.logo_wrapper}></View>
+                        <View style={styles.logo_wrapper}>
+                            <Image
+                                source={require('../assets/images/taja_logo.png')}
+                                style={styles.logo_img}
+                            />
+                        </View>
                         <View style={{flex:4}}></View>
                         <View style={styles.create_chat_wrapper}>
-                            <TouchableOpacity style={{flex:1,alignContent:'center'}} onPress={()=>this.setState({isModalVisible:true})}>
+                            <TouchableOpacity style={styles.bottom_icon_wrapper} onPress={()=>this.setState({ModalCreateChatVisible:true})}>
                                 <Icon
-                                    name="arrow-right"
-                                    size={48}
-                                    color="white"
+                                    name="plus"
+                                    size={28}
+                                    color="#ffb000"
                                 />
-                                <Modal isVisible={this.state.isModalVisible}>
-                                    <View style={styles.modal_wrapper}>
-                                        <View style={{height:400,backgroundColor:'white',padding : 25}}>
-                                            <View style={styles.modal_title_area}>
-                                                <Text style={styles.text_modal_title}>새로운 동행</Text>
-                                            </View>
-                                            <View style={styles.modal_location_area}>
-                                                <View style={styles.modal_startLocation_wrapper}>
-                                                    <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
-                                                        <Text style={{fontSize:RFValue(16)}}>출발</Text>
-                                                    </View>
-                                                    <View style={{flex:3}}>
-                                                        <Select
-                                                            onValueChange={(value) => this.setState({selectedStartLocation : value})}
-                                                            placeholder={{ label: '출발장소',value :null}}
-                                                            style={{flex:1}}
-                                                            items={[
-                                                                { label: '안양역', value: '안양역' },
-                                                                { label: '안양대 정문', value: '안양대 정문' },
-                                                                { label: '안양대 후문', value: '안양대 후문' },
-                                                            ]}
-                                                        />
-                                                    </View>
-                                                </View>
-                                                <View style={styles.modal_EndLocation_wrapper}>
-                                                    <Select
-                                                        onValueChange={(value) => this.setState({selectedEndLocation : value})}
-                                                        placeholder={{label: '도착장소'}}
-                                                        items={[
-                                                            { label: '안양대 정문', value: '안양대 정문' },
-                                                            { label: '안양대 후문', value: '안양대 후문' },
-                                                            { label: '안양역', value: '안양역' },
-                                                        ]}
-                                                    />
-                                                </View>
-                                            </View>
-                                            <View style={styles.modal_time_area}>
-                                                <View style={styles.modal_button_area}>
-                                                    <Button titleStyle={{color:'black'}} type="clear" title="취소" onPress={this.toggleModal.bind(this)} />
-                                                    <View style={{width:16}}></View>
-                                                    <Button titleStyle={{color:'black'}} type="clear" title="확인" onPress={this.createChattingRoom.bind(this)} />
-                                                </View>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </Modal>
+                                <ModalCreateChat
+                                    ModalCreateChatVisible={this.state.ModalCreateChatVisible}
+                                    selectStartLocation={(location)=>this.selectStartLocation(location)}
+                                    selectEndLocation={(location)=>this.selectEndLocation(location)}
+                                    toggleModalCreateChat={()=>this.toggleModalCreateChat()}
+                                    createChattingRoom={()=>this.createChattingRoom()}/>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.profile_wrapper}>
-                            <TouchableOpacity onPress={() => this.props.navigation.navigate('ResetPw')}>
+                            <TouchableOpacity style={styles.bottom_icon_wrapper} onPress={() => this.props.navigation.navigate('ResetPw')}>
                                 <Icon
-                                    name="arrow-right"
-                                    size={48}
+                                    name="user-o"
+                                    size={28}
                                     color="white"
                                 />
                             </TouchableOpacity>
@@ -168,6 +161,109 @@ export default class HomeScreen extends React.Component {
             </View>
         )
     }
+}
+function ModalCreateChat(props){
+    return (
+        <Modal isVisible={props.ModalCreateChatVisible}>
+            <View style={styles.modal_wrapper}>
+                <View style={{height:400,backgroundColor:'white',padding : 25,borderRadius:10}}>
+                    <View style={styles.modal_title_area}>
+                        <Text style={styles.text_modal_title}>새로운 동행</Text>
+                    </View>
+                    <View style={styles.modal_location_area}>
+                        <View style={styles.modal_startLocation_wrapper}>
+                            <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
+                                <Text style={{fontSize:RFValue(16)}}>출발</Text>
+                            </View>
+                            <View style={styles.select_wrapper}>
+                                <Select
+                                    onValueChange={(value) => props.selectStartLocation(value)}
+                                    placeholder={{ label: '출발장소',value :null,color: '#CCCCCC'}}
+                                    style={{flex:1}}
+                                    items={[
+                                        { label: '안양역', value: '안양역' },
+                                        { label: '안양대 정문', value: '안양대 정문' },
+                                        { label: '안양대 후문', value: '안양대 후문' },
+                                    ]}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.modal_EndLocation_wrapper}>
+                        <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
+                                <Text style={{fontSize:RFValue(16)}}>도착</Text>
+                            </View>
+                            <View style={styles.select_wrapper}>
+                                <Select
+                                    onValueChange={(value) => props.selectEndLocation(value)}
+                                    placeholder={{ label: '도착장소',value :null,color: '#CCCCCC'}}
+                                    style={{flex:1}}
+                                    items={[
+                                        { label: '안양대 정문', value: '안양대 정문' },
+                                        { label: '안양대 후문', value: '안양대 후문' },
+                                        { label: '안양역', value: '안양역' },
+                                    ]}
+                                />
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.modal_time_area}>
+                        <View style={styles.modal_button_area}>
+                            <Button titleStyle={{color:'black'}} type="clear" title="취소" onPress={()=>props.toggleModalCreateChat()} />
+                            <View style={{width:16}}></View>
+                            <Button titleStyle={{color:'black'}} type="clear" title="확인" onPress={()=>props.createChattingRoom()} />
+                        </View>
+                    </View>
+                </View>
+            </View>
+        </Modal>
+    )
+}
+
+function ModalEnterChat(props){
+    return (
+        <Modal isVisible={props.ModalEnterChatVisible}>
+            <View style={styles.modal_enterChat_wrapper}>
+                <View style={{height:200,backgroundColor:'white',padding : 25,borderRadius:10}}>
+                    <View style={styles.modal_title_area}>
+                        <Text style={styles.text_modal_title}>동행 요청</Text>
+                    </View>
+                    <View style={styles.modal_location_area}>
+                        <View style={styles.modal_startLocation_wrapper}>
+                            <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
+                                <Text style={{fontSize:RFValue(16)}}>출발</Text>
+                            </View>
+                            <View style={styles.select_wrapper}>
+                                <Text>출발장소</Text>
+                            </View>
+                        </View>
+                        <View style={styles.modal_EndLocation_wrapper}>
+                            <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
+                                <Text style={{fontSize:RFValue(16)}}>도착</Text>
+                            </View>
+                            <View style={styles.select_wrapper}>
+                                <Text>도착장소</Text>
+                            </View>
+                        </View>
+                        <View style={styles.modal_EndLocation_wrapper}>
+                            <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
+                                <Text style={{fontSize:RFValue(16)}}>시각</Text>
+                            </View>
+                            <View style={styles.select_wrapper}>
+                                <Text>09:00 AM</Text>
+                            </View>
+                        </View>
+                    </View>
+                    <View style={styles.modal_time_area}>
+                        <View style={styles.modal_button_area}>
+                            <Button titleStyle={{color:'black'}} type="clear" title="취소" onPress={()=>props.toggleModalEnterChat()} />
+                            <View style={{width:16}}></View>
+                            <Button titleStyle={{color:'black'}} type="clear" title="확인" onPress={()=>props.enterChattingRoom()} />
+                        </View>
+                    </View>
+                </View>
+            </View>
+        </Modal>
+    )
 }
 
 class ChattingRoom extends React.Component {
@@ -178,19 +274,29 @@ class ChattingRoom extends React.Component {
     }
 
     render() {
+        /*  */
         return(
             <View style={styles.row}>
-                <TouchableOpacity style={styles.row_wrapper} onPress={() => this.props.me.props.navigation.navigate('Chat', this.props.channelData)}>
+                <TouchableOpacity style={styles.row_wrapper} onPress={()=>this.props.handlePressList(this.props.channelData)} >
                     <View style={styles.icon_area}>
+                        <View style={styles.icon_wrapper}>
+                            <Image
+                                source={require('../assets/images/taja_logo.png')}
+                                style={styles.logo_img}
+                            />
+                        </View>
+                        <View styles={{flex:1}}>
+                            <Text style={styles.text_nickname}>택시타자</Text>
+                        </View>
                     </View>
                     <View style={styles.description_area}>
                         <View style={{flex:1}}></View>
                         <View style={styles.description}>
-                            <Text style={styles.text_description_title}>출발 </Text>
+                            <Text style={styles.text_description_title}>출발   </Text>
                             <Text style={styles.text_description}>{this.props.channelData.startLocation}</Text>
                         </View>
                         <View style={styles.description}>
-                            <Text style={styles.text_description_title}>도착 </Text>
+                            <Text style={styles.text_description_title}>도착   </Text>
                             <Text style={styles.text_description}>{this.props.channelData.arriveLocation}</Text>
                         </View>
                         <View style={{flex:1}}></View>
@@ -219,7 +325,7 @@ const styles = StyleSheet.create({
     bottom_area: {
         height: 48,
         width: "100%",
-        backgroundColor:'red',
+        backgroundColor:'#0d1f37',
         bottom: 0,
         flexDirection : 'row'
     },
@@ -274,7 +380,6 @@ const styles = StyleSheet.create({
     modal_startLocation_wrapper: {
         flex:1,
         flexDirection: 'row',
-        backgroundColor: 'purple',
     },
     modal_EndLocation_wrapper: {
         flex:1,
@@ -283,6 +388,13 @@ const styles = StyleSheet.create({
     description: {
         flex : 2,
         flexDirection: 'row',
+    },
+    text_nickname: {
+        fontSize:  RFValue(11),
+        color : "gray",
+        letterSpacing : -1,
+        textAlign: 'center',
+        marginBottom: 10,
     },
     text_description_title: {
         fontSize:  RFValue(11),
@@ -313,15 +425,21 @@ const styles = StyleSheet.create({
     },
     logo_wrapper: {
         flex:1,
-        backgroundColor: 'green',
+        justifyContent : 'center',
+        alignItems : 'center',
     },
     create_chat_wrapper: {
         flex:1,
-        backgroundColor: 'blue',
+        marginRight: 5,
     },
     profile_wrapper: {
         flex:1,
-        backgroundColor: 'yellow',
+        marginRight: 5,
+    },
+    bottom_icon_wrapper: {
+        flex:1,
+        alignItems:'center',
+        justifyContent:'center'
     },
     modal_wrapper: {
         flex:1,
@@ -329,5 +447,35 @@ const styles = StyleSheet.create({
         paddingLeft : "10.18%",
         paddingRight : "10.18%",
         borderRadius : 100,
+    },
+    modal_enterChat_wrapper: {
+        flex:1,
+        paddingLeft : "10.18%",
+        paddingRight : "10.18%",
+        borderRadius : 100,
+        justifyContent: 'center'
+    },
+    select_wrapper: {
+        flex:3,
+        borderWidth: 1,
+        marginTop:8,
+        justifyContent:'center',
+        borderRadius:4,
+        borderColor:'#dcdcdc'
+    },
+    icon_wrapper: {
+        flex: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    logo_img : {
+        width : '75%',
+        height : '60%',
+        resizeMode : 'contain',
+    },
+    icon_img: {
+        width : '75%',
+        height : '60%',
+        resizeMode : 'contain',
     }
 });

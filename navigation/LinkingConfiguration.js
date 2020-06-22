@@ -15,15 +15,9 @@ export default {
     },
     SignUp : {
       path : 'login/signUp',
-      /* screens : {
-        SignUp : 'SignUp'
-      } */
     },
     ResetPw : {
       path : 'login/resetPw',
-      /* screens : {
-        ResetPw : 'ResetPw'
-      } */
     },
     Chat : {
       path : 'home/chat',

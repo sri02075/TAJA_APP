@@ -25,10 +25,10 @@ export default class ResetpwScreen extends Component {
         return (
         <View style={styles.container}>
             <View style={styles.logo_area}>
-            <Image
-                source={require('../assets/images/taja_logo.png')}
-                style={this.state.appearKeyboard ? {height : 0} :styles.logo_img}
-            />
+                <Image
+                    source={require('../assets/images/taja_logo.png')}
+                    style={this.state.appearKeyboard ? {height : 0} :styles.logo_img}
+                />
             </View>
             <View style={styles.title_area}>
                 <Text style={styles.text_title}>PASSWORD RESET</Text>
