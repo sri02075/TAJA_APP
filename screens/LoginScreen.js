@@ -17,8 +17,7 @@ export default class LoginScreen extends Component {
             try {
                 const token = await deviceStorage.getItem('JWT')
                 if(token){
-                    //api()
-                    //this.props.navigation.navigate('Test')
+                    this.props.navigation.navigate('Home',token)
                 }
             }catch(err){
                 console.log(err)
@@ -42,10 +41,9 @@ export default class LoginScreen extends Component {
             const {result,success} = response.data
             if(success){
                 //alert(result.token)
-                //await deviceStorage.saveItem('JWT', result.token)
+                await deviceStorage.saveItem('JWT', result.token)
                 const token = await deviceStorage.getItem('JWT')
-                alert(token)
-                //this.props.navigation.navigate('Test')
+                this.props.navigation.navigate('Home',token)
             }else{
                 alert('아이디와 비밀번호를 확인해주세요')
             }

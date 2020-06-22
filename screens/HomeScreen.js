@@ -9,6 +9,7 @@ import Modal from 'react-native-modal';
 import Select from 'react-native-picker-select';
 import { CommonActions } from '@react-navigation/native';
 import SendBird from 'sendbird'
+import axios from 'axios';
 import { StackActions, NavigationActions } from 'react-navigation';
 
 export default class HomeScreen extends React.Component {
@@ -23,19 +24,19 @@ export default class HomeScreen extends React.Component {
             selectedTime : '09:00 AM',
             selectedChattingRoom : {},
             chattingRoomList : [],
-            userName : '익명이'
+            userName : this.getNickname()
         }
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.sb.connect(this.state.userName, (user, error) => {})
         this.props.navigation.setOptions(header)
     }
     componentDidMount() {
-        if(this.props.route.params !== 'init'){
+        if(this.props.route.params.substring(0,6) !== 'Bearer'){
             this.props.navigation.dispatch(
                 CommonActions.reset({
                     index: 1,
                     routes: [
-                    { name: 'Home',key: null,params:'init' },
+                    { name: 'Home',key: null,params:'Bearer '+this.props.route.params },
                     ],
                 })
             )
@@ -45,7 +46,14 @@ export default class HomeScreen extends React.Component {
     selectStartLocation(location) {
         this.setState({selectedStartLocation:location})
     }
-
+    async getNickname() {
+        const token =this.props.route.params
+        const response = await axios.get(
+            'https://api.taja.awmaker.com/user',
+            { headers: {"Authorization" : token}}
+        )
+        return response.data.result
+    }
     selectEndLocation(location) {
         this.setState({selectedEndLocation:location})
     }
