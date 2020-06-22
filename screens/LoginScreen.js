@@ -27,6 +27,7 @@ export default class LoginScreen extends Component {
         checkJWT()
     }
     componentDidMount() {
+        console.log(this.props.navigation,this.props.route)
         /* const resetAction = StackActions.reset({
         index: 0,
         actions: [NavigationActions.navigate({ routeName: 'Login' })],

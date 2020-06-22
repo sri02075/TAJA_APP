@@ -170,7 +170,7 @@ class ChatContentByOther extends React.Component {
                         <Text style={styles.text_nickname}>{this.props.name}</Text>
                     </View>
                     <View style={styles.chat_wrapper}>
-                            <Text style={styles.text_chat}>{this.props.contents}</Text>
+                        <Text style={styles.text_chat}>{this.props.contents}</Text>
                     </View>
                 </View>
                 <View style={styles.time_wrapper}>
