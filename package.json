@@ -38,7 +38,8 @@
     "react-native-simple-toast": "^1.1.2",
     "react-native-vector-icons": "^6.6.0",
     "react-native-web": "~0.11.7",
-    "react-navigation": "^4.3.9"
+    "react-navigation": "^4.3.9",
+    "sendbird": "^3.0.126"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",
