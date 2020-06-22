@@ -15,7 +15,6 @@ export default class HomeScreen extends React.Component {
     constructor(props){
         super(props)
         this.state = {
-            ChattingRoomList : [1,2,3,4,5,6,7],
             ModalCreateChatVisible : false,
             ModalEnterChatVisible : false,
             appearKeyboard  : false,
@@ -23,7 +22,7 @@ export default class HomeScreen extends React.Component {
             selectedEndLocation : '',
             selectedTime : '09:00 AM',
             selectedChattingRoom : {},
-            chattingRoomList2 : [],
+            chattingRoomList : [],
             userName : '익명이'
         }
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
@@ -101,7 +100,7 @@ export default class HomeScreen extends React.Component {
                 return;
             }
             This.setState({
-                chattingRoomList2 : openChannels
+                chattingRoomList : openChannels
             })
         })
     }
@@ -117,7 +116,7 @@ export default class HomeScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <ScrollView onRefresh={()=>alert('hello')}>
-                    {this.renderChattingRooms(this.state.chattingRoomList2)}
+                    {this.renderChattingRooms(this.state.chattingRoomList)}
                 </ScrollView>
                 <Button
                     icon={
