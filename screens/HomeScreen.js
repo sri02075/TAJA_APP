@@ -64,18 +64,15 @@ export default class HomeScreen extends React.Component {
     handleRefresh(){
         let openChannelListQuery = this.sb.OpenChannel.createOpenChannelListQuery();
         const This = this
-        
         openChannelListQuery.next(function(openChannels, error) {
             if (error) {
                 return;
             }
-            
             This.setState({
                 chattingRoomList2 : openChannels
             })
         })
     }
-    
     toggleModal = () => {
         this.setState({isModalVisible: !this.state.isModalVisible})
     }
@@ -112,34 +109,45 @@ export default class HomeScreen extends React.Component {
                                 />
                                 <Modal isVisible={this.state.isModalVisible}>
                                     <View style={styles.modal_wrapper}>
-                                        <View style={{height:400,backgroundColor:'red'}}>
+                                        <View style={{height:400,backgroundColor:'white',padding : 25}}>
                                             <View style={styles.modal_title_area}>
-                                                <Text>새로운 동행</Text>
+                                                <Text style={styles.text_modal_title}>새로운 동행</Text>
                                             </View>
                                             <View style={styles.modal_location_area}>
-                                                <Select
-                                                    onValueChange={(value) => this.setState({selectedStartLocation : value})}
-                                                    placeholder={{ label: '출발장소',value :null}}
-                                                    items={[
-                                                        { label: '안양역', value: '안양역' },
-                                                        { label: '안양대 정문', value: '안양대 정문' },
-                                                        { label: '안양대 후문', value: '안양대 후문' },
-                                                    ]}
-                                                />
-                                                <Select
-                                                    onValueChange={(value) => this.setState({selectedEndLocation : value})}
-                                                    placeholder={{label: '도착장소'}}
-                                                    items={[
-                                                        { label: '안양대 정문', value: '안양대 정문' },
-                                                        { label: '안양대 후문', value: '안양대 후문' },
-                                                        { label: '안양역', value: '안양역' },
-                                                    ]}
-                                                />
+                                                <View style={styles.modal_startLocation_wrapper}>
+                                                    <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
+                                                        <Text style={{fontSize:RFValue(16)}}>출발</Text>
+                                                    </View>
+                                                    <View style={{flex:3}}>
+                                                        <Select
+                                                            onValueChange={(value) => this.setState({selectedStartLocation : value})}
+                                                            placeholder={{ label: '출발장소',value :null}}
+                                                            style={{flex:1}}
+                                                            items={[
+                                                                { label: '안양역', value: '안양역' },
+                                                                { label: '안양대 정문', value: '안양대 정문' },
+                                                                { label: '안양대 후문', value: '안양대 후문' },
+                                                            ]}
+                                                        />
+                                                    </View>
+                                                </View>
+                                                <View style={styles.modal_EndLocation_wrapper}>
+                                                    <Select
+                                                        onValueChange={(value) => this.setState({selectedEndLocation : value})}
+                                                        placeholder={{label: '도착장소'}}
+                                                        items={[
+                                                            { label: '안양대 정문', value: '안양대 정문' },
+                                                            { label: '안양대 후문', value: '안양대 후문' },
+                                                            { label: '안양역', value: '안양역' },
+                                                        ]}
+                                                    />
+                                                </View>
                                             </View>
                                             <View style={styles.modal_time_area}>
                                                 <View style={styles.modal_button_area}>
-                                                    <Button style={{flex:1}} title="Hide Modal" onPress={this.toggleModal.bind(this)} />
-                                                    <Button style={{flex:1}} title="create chat" onPress={this.createChattingRoom.bind(this)} />
+                                                    <Button titleStyle={{color:'black'}} type="clear" title="취소" onPress={this.toggleModal.bind(this)} />
+                                                    <View style={{width:16}}></View>
+                                                    <Button titleStyle={{color:'black'}} type="clear" title="확인" onPress={this.createChattingRoom.bind(this)} />
                                                 </View>
                                             </View>
                                         </View>
@@ -217,15 +225,16 @@ const styles = StyleSheet.create({
     },
     modal_title_area: {
         flex:4,
-        backgroundColor:"green",
+        /* backgroundColor:"green", */
+        justifyContent: 'center',
     },
     modal_location_area: {
         flex:5,
-        backgroundColor:"yellow",
+        /* backgroundColor:"yellow", */
     },
     modal_time_area: {
         flex:9,
-        backgroundColor:"blue",
+        /* backgroundColor:"blue", */
     },
     modal_button_area: {
         flex:3,
@@ -262,6 +271,15 @@ const styles = StyleSheet.create({
         paddingRight: 15,
         paddingTop: 25
     },
+    modal_startLocation_wrapper: {
+        flex:1,
+        flexDirection: 'row',
+        backgroundColor: 'purple',
+    },
+    modal_EndLocation_wrapper: {
+        flex:1,
+        flexDirection: 'row',
+    },
     description: {
         flex : 2,
         flexDirection: 'row',
@@ -274,6 +292,11 @@ const styles = StyleSheet.create({
     text_description: {
         fontSize:  RFValue(11),
         color : "gray",
+        letterSpacing : -1,
+    },
+    text_modal_title: {
+        fontSize: RFValue(18),
+        fontWeight: '600',
         letterSpacing : -1,
     },
     button : {
