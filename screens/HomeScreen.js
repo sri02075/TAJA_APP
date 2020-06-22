@@ -7,7 +7,9 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import { ScrollView } from 'react-native-gesture-handler';
 import Modal from 'react-native-modal';
 import Select from 'react-native-picker-select';
+import { CommonActions } from '@react-navigation/native';
 import SendBird from 'sendbird'
+import { StackActions, NavigationActions } from 'react-navigation';
 
 export default class HomeScreen extends React.Component {
     constructor(props){
@@ -26,9 +28,19 @@ export default class HomeScreen extends React.Component {
         }
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.sb.connect(this.state.userName, (user, error) => {})
+        this.props.navigation.setOptions(header)
     }
-
     componentDidMount() {
+        if(this.props.route.params !== 'init'){
+            this.props.navigation.dispatch(
+                CommonActions.reset({
+                    index: 1,
+                    routes: [
+                    { name: 'Home',key: null,params:'init' },
+                    ],
+                })
+            )
+        }
         this.handleRefresh()
     }
     selectStartLocation(location) {
@@ -104,7 +116,7 @@ export default class HomeScreen extends React.Component {
     render(){
         return (
             <View style={styles.container}>
-                <ScrollView>
+                <ScrollView onRefresh={()=>alert('hello')}>
                     {this.renderChattingRooms(this.state.chattingRoomList2)}
                 </ScrollView>
                 <Button
@@ -223,7 +235,7 @@ function ModalEnterChat(props){
     return (
         <Modal isVisible={props.ModalEnterChatVisible}>
             <View style={styles.modal_enterChat_wrapper}>
-                <View style={{height:200,backgroundColor:'white',padding : 25,borderRadius:10}}>
+                <View style={{height:230,backgroundColor:'white',padding : 25,borderRadius:10}}>
                     <View style={styles.modal_title_area}>
                         <Text style={styles.text_modal_title}>동행 요청</Text>
                     </View>
@@ -232,24 +244,24 @@ function ModalEnterChat(props){
                             <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
                                 <Text style={{fontSize:RFValue(16)}}>출발</Text>
                             </View>
-                            <View style={styles.select_wrapper}>
-                                <Text>출발장소</Text>
+                            <View style={styles.modal_text_wrapper}>
+                                <Text style={{fontSize:RFValue(15),color:'#A6A6A6'}}>출발장소</Text>
                             </View>
                         </View>
                         <View style={styles.modal_EndLocation_wrapper}>
                             <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
                                 <Text style={{fontSize:RFValue(16)}}>도착</Text>
                             </View>
-                            <View style={styles.select_wrapper}>
-                                <Text>도착장소</Text>
+                            <View style={styles.modal_text_wrapper}>
+                                <Text style={{fontSize:RFValue(15),color:'#A6A6A6'}}>도착장소</Text>
                             </View>
                         </View>
-                        <View style={styles.modal_EndLocation_wrapper}>
+                        <View style={styles.modal_Time_wrapper}>
                             <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
                                 <Text style={{fontSize:RFValue(16)}}>시각</Text>
                             </View>
-                            <View style={styles.select_wrapper}>
-                                <Text>09:00 AM</Text>
+                            <View style={styles.modal_text_wrapper}>
+                                <Text style={{fontSize:RFValue(15),color:'#A6A6A6'}}>09:00 AM</Text>
                             </View>
                         </View>
                     </View>
@@ -312,10 +324,22 @@ class ChattingRoom extends React.Component {
         )
     }
 }
+const header = {
+    title: '동행',
+    headerStyle: {
+        backgroundColor: 'white',
+        elevation: 0,
+        shadowOpacity: 0,
+        borderBottomWidth: 2,
+    },
+    headerTintColor: 'black',
+    headerTitleStyle: {
+        fontWeight: 'bold',
+    },
+}
 HomeScreen.navigationOptions = {
-    header: null,
+    header: header,
 };
-
 
 const styles = StyleSheet.create({
     container: {
@@ -335,11 +359,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     modal_location_area: {
-        flex:5,
+        flex:10,
         /* backgroundColor:"yellow", */
     },
     modal_time_area: {
-        flex:9,
+        flex:4,
         /* backgroundColor:"blue", */
     },
     modal_button_area: {
@@ -384,6 +408,14 @@ const styles = StyleSheet.create({
     modal_EndLocation_wrapper: {
         flex:1,
         flexDirection: 'row',
+    },
+    modal_Time_wrapper: {
+        flex:1,
+        flexDirection: 'row',
+    },
+    modal_text_wrapper: {
+        flex:3,
+        justifyContent:'center'
     },
     description: {
         flex : 2,
