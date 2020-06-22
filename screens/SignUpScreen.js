@@ -19,6 +19,7 @@ export default class SignupScreen extends Component {
         }
     }
     componentDidMount(){
+        console.log(this.props.route,this.props.navigation)
         this.props.navigation.setOptions(header)
         this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', ()=>this.setState({appearKeyboard : true}))
         this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', ()=>this.setState({appearKeyboard : false}))
@@ -48,8 +49,8 @@ export default class SignupScreen extends Component {
             return
         }
         this.props.navigation.pop()
-}
-render(){
+    }
+    render(){
         return (
         <View style={styles.container}>
             <View style={styles.logo_area}>

@@ -31,6 +31,7 @@ export default class ChatScreen extends React.Component {
 
         this.state = {
             chatHistory : [{name: 'sri', contents: 'sad'},{name: 'sri2', contents: 'sadddd'}],
+            
             inputChat : ''
         }
 
@@ -138,7 +139,7 @@ class ChatContent extends React.Component {
                         <Text style={styles.text_nickname}>{this.props.name}</Text>
                     </View>
                     <View style={styles.chat_wrapper}>
-                            <Text style={styles.text_chat}>{this.props.contents}</Text>
+                        <Text style={styles.text_chat}>{this.props.contents}</Text>
                     </View>
                 </View>
                 <View style={styles.time_wrapper}></View>
