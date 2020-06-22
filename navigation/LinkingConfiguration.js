@@ -25,6 +25,9 @@ export default {
         ResetPw : 'ResetPw'
       } */
     },
+    Chat : {
+      path : 'home/chat',
+    },
     Home : {
       path : 'home'
     }
