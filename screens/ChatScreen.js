@@ -30,24 +30,8 @@ export default class ChatScreen extends React.Component {
         })
 
         this.state = {
-            chatHistory : [{
-                profileLogo: '',
-                name: 'sri',
-                contents: 'sad',
-                timeStamp: ''
-            },
-            {
-                profileLogo: '',
-                name: 'sri21',
-                contents: 'sadkkk',
-                timeStamp: ''
-            },
-            {
-                profileLogo: '',
-                name: '익명이',
-                contents: '그래서 뭐',
-                timeStamp: ''
-            }],
+            chatHistory : [],
+            participants : [],
             inputChat : '',
             defaultIcon : '../메이커스/1x/어플아이콘.png',
         }
@@ -59,52 +43,10 @@ export default class ChatScreen extends React.Component {
         this.sb.addChannelHandler("UNIQUE_KEY", channelHandler)
     }
     
-    componentDidMount() {
-        // this.chatRefresh()
-    }
-
-    //11
-    chatRefresh(){
-        const This = this
-        this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
-            if (error) {
-                return;
-            }
-        
-            const lastMessage = openChannel.createPreviousMessageListQuery()
-            lastMessage.limit = 1
-
-            lastMessage.load(function(message, error) {
-                if (error) {
-                    return
-                }
-                if(message[0].messageType=="user"){
-                    This.state.chatHistory.push({
-                        profileLogo: '',
-                        name: message[0]._sender.userId,
-                        contents: message[0].message,
-                        timeStamp: (new Date()).toString()
-                    })
-                } else {
-                    This.state.chatHistory.push({
-                        profileLogo: '',
-                        name: message[0].messageType,
-                        contents: message[0].message,
-                        timeStamp: (new Date()).toString()
-                    })
-                }
-                This.setState({
-                    chatHistory: This.state.chatHistory
-                })
-            })
-        })
-    }
-
-    enterChat(value) {
+    sendCustomMessage(str) {
         const This = this
         const params = new this.sb.UserMessageParams()
-        params.message = value.nativeEvent.text
-        value =''
+        params.message = str
 
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
@@ -126,13 +68,112 @@ export default class ChatScreen extends React.Component {
         })
     }
 
+    componentDidMount() {
+        const This = this
+        this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
+            if (error) {
+                return;
+            }
+        
+            const lastMessage = openChannel.createPreviousMessageListQuery()
+            lastMessage.limit = 100
+
+            lastMessage.load(function(message, error) {
+                if (error) {
+                    return
+                }
+                message.map((msg) => {
+                    let nameInfo
+                    if(msg.messageType=="user"){
+                        nameInfo = msg._sender.userId
+                    } else {
+                        nameInfo = 'ADMIN'
+                    }
+                    This.state.chatHistory.push({
+                        profileLogo: '',
+                        name: nameInfo,
+                        contents: msg.message,
+                        timeStamp: msg.createdAt
+                    })
+                })
+                This.setState({
+                    chatHistory: This.state.chatHistory
+                })
+            })
+        })
+    }
+
+    convertTimeStamp(timeStamp) {
+        const time = new Date(timeStamp)
+        let hour = time.getHours()
+        let minute = time.getMinutes()
+        let part = "오전"
+        if(hour>12){
+            part = "오후"
+            hour -= 12
+        }
+        if(hour<10){
+            hour = `0${hour}`
+        }
+        if(minute<10){
+            minute = `0${minute}`
+        }
+        
+        return `${part} ${hour}:${minute}`
+    }
+
+    
+    chatRefresh(){
+        const This = this
+        this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
+            if (error) {
+                return;
+            }
+        
+            const lastMessage = openChannel.createPreviousMessageListQuery()
+            lastMessage.limit = 1
+
+            lastMessage.load(function(message, error) {
+                if (error) {
+                    return
+                }
+                let nameInfo
+                if(message[0].messageType=="user"){
+                    nameInfo = message[0]._sender.userId
+                } else {
+                    nameInfo = 'ADMIN'
+                }
+
+                This.state.chatHistory.push({
+                    profileLogo: '',
+                    name: nameInfo,
+                    contents: message[0].message,
+                    timeStamp: Date.now()
+                })
+
+                This.setState({
+                    chatHistory: This.state.chatHistory
+                })
+            })
+        })
+    }
+
+    enterChat(value) {
+        this.sendCustomMessage(value.nativeEvent.text)
+    }
+
+    //11
+    // nBBang(money) {
+    //     this.sendCustomMessage(
+    //         `더치페이 금액은 ${money/(this.state.participants.length)}입니다!
+    //         `)
+    // }
+
     renderChat() {
         return this.state.chatHistory.map((chat,idx) =>{
-            if(this.channelData.userName===chat.name){
-                return <ChatContentByMe key={idx} contents={chat.contents} />
-            } else {
-                return <ChatContentByOther key={idx} name={chat.name} contents={chat.contents} icon={this.state.defaultIcon} />
-            }
+            return (this.channelData.userName===chat.name) ?
+            <ChatContentByMe key={idx} contents={chat.contents} time={this.convertTimeStamp(chat.timeStamp)} /> :
+            <ChatContentByOther key={idx} name={chat.name} contents={chat.contents} icon={this.state.defaultIcon} time={this.convertTimeStamp(chat.timeStamp)} />
         })
     }
 
@@ -174,7 +215,7 @@ class ChatContentByOther extends React.Component {
                     </View>
                 </View>
                 <View style={styles.time_wrapper}>
-                    <Text style={styles.text_time}>  오전 08:40</Text>
+                    <Text style={styles.text_time}>  {this.props.time}</Text>
                 </View>
             </View>
         )
@@ -190,7 +231,7 @@ class ChatContentByMe extends React.Component {
         return(
             <View style={styles.chatContent_area_me}>
                 <View style={styles.time_wrapper_me}>
-                    <Text style={styles.text_time}>오전 08:40  </Text>
+                    <Text style={styles.text_time}>{this.props.time}  </Text>
                 </View>
                 <View style={styles.contents_wrapper}>
                     <View style={styles.chat_wrapper_me}>
