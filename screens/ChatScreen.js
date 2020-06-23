@@ -11,11 +11,12 @@ import SendBird from 'sendbird'
 export default class ChatScreen extends React.Component {
     constructor(props){
         super(props)
-        const This = this
+        const self = this
 
         this.channelData = this.props.route.params
-
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
+        this.channelHandler = new this.sb.ChannelHandler()
+
         this.sb.connect(this.channelData.userName, (user, error) => {})
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
@@ -26,6 +27,7 @@ export default class ChatScreen extends React.Component {
                 if (error) {
                     return;
                 }
+                // self.sendCustomMessage(`${self.channelData.userName}님이 입장하셨습니다!!`)
             })
         })
 
@@ -36,15 +38,25 @@ export default class ChatScreen extends React.Component {
             defaultIcon : '../assets/images/taja_logo.png',
         }
 
-        const channelHandler = new this.sb.ChannelHandler()
-        channelHandler.onMessageReceived = function(channel, message) {
-            This.chatRefresh()
+        this.channelHandler.onMessageReceived = function(channel, message) {
+            self.chatRefresh()
         }
-        this.sb.addChannelHandler("UNIQUE_KEY", channelHandler)
+        this.channelHandler.onUserEntered = function(channel, message) {
+            // self.chatRefresh()
+        }
+        this.sb.addChannelHandler("UNIQUE_KEY", this.channelHandler)
     }
     
+    getParticipants() {
+        this.sb.OpenChannel.getChannel(this.channelData.url, (openChannel, error) => {
+            openChannel.getMetaData("participantsList", (response, error) => {
+                sd
+            })
+        })
+    }
+
     sendCustomMessage(str) {
-        const This = this
+        const self = this
         const params = new this.sb.UserMessageParams()
         params.message = str
 
@@ -56,12 +68,14 @@ export default class ChatScreen extends React.Component {
                 if (error) {
                     return
                 }
-                This.state.chatHistory.push({
-                    name: message._sender.userId,
-                    contents: message.message
+                self.state.chatHistory.push({
+                    profileLogo: '',
+                    name: self.channelData.userName,
+                    contents: message.message,
+                    timeStamp: message.createdAt
                 })
-                This.setState({
-                    chatHistory: This.state.chatHistory,
+                self.setState({
+                    chatHistory: self.state.chatHistory,
                     inputChat: ''
                 })
             })
@@ -69,7 +83,7 @@ export default class ChatScreen extends React.Component {
     }
 
     componentDidMount() {
-        const This = this
+        const self = this
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
                 return;
@@ -82,25 +96,27 @@ export default class ChatScreen extends React.Component {
                 if (error) {
                     return
                 }
-                message.map((msg) => {
+                message.forEach((msg) => {
                     let nameInfo
                     if(msg.messageType=="user"){
                         nameInfo = msg._sender.userId
                     } else {
                         nameInfo = 'ADMIN'
                     }
-                    This.state.chatHistory.push({
+                    self.state.chatHistory.push({
                         profileLogo: '',
                         name: nameInfo,
                         contents: msg.message,
                         timeStamp: msg.createdAt
                     })
                 })
-                This.setState({
-                    chatHistory: This.state.chatHistory
+                
+                self.setState({
+                    chatHistory: self.state.chatHistory
                 })
-            })
+            })  
         })
+        
     }
 
     convertTimeStamp(timeStamp) {
@@ -124,7 +140,7 @@ export default class ChatScreen extends React.Component {
 
     
     chatRefresh(){
-        const This = this
+        const self = this
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
                 return;
@@ -144,15 +160,15 @@ export default class ChatScreen extends React.Component {
                     nameInfo = 'ADMIN'
                 }
 
-                This.state.chatHistory.push({
+                self.state.chatHistory.push({
                     profileLogo: '',
                     name: nameInfo,
                     contents: message[0].message,
                     timeStamp: Date.now()
                 })
 
-                This.setState({
-                    chatHistory: This.state.chatHistory
+                self.setState({
+                    chatHistory: self.state.chatHistory
                 })
             })
         })
@@ -162,12 +178,14 @@ export default class ChatScreen extends React.Component {
         this.sendCustomMessage(value.nativeEvent.text)
     }
 
-    //11
-    // nBBang(money) {
-    //     this.sendCustomMessage(
-    //         `더치페이 금액은 ${money/(this.state.participants.length)}입니다!
-    //         `)
-    // }
+    onContentSizeChangeHandler() {
+        if(this.state.chatHistory.length>0){
+            if(this.state.chatHistory[this.state.chatHistory.length-1].name===this.channelData.userName){
+                this.scrollview.scrollToEnd({animated: true})
+            }
+        }
+        
+    }
 
     renderChat() {
         return this.state.chatHistory.map((chat,idx) =>{
@@ -180,7 +198,11 @@ export default class ChatScreen extends React.Component {
     render(){
         return (
             <View style={styles.container}>
-                <ScrollView syle={{transform: [{ scaleY: -1 }]}}>
+                <ScrollView
+                    syle={{transform: [{ scaleY: -1 }]}}
+                    ref={ref => this.scrollview = ref}
+                    onContentSizeChange={this.onContentSizeChangeHandler.bind(this)} 
+                >
                     <View>{this.renderChat()}</View>
                 </ScrollView>
                 <View>
