@@ -52,13 +52,24 @@ export default class LoginScreen extends Component {
                 //alert(result.token)
                 await deviceStorage.saveItem('JWT', result.token)
                 const token = await deviceStorage.getItem('JWT')
-                this.props.navigation.navigate('Home',token)
+                const response = await axios.get(
+                    'https://api.taja.awmaker.com/user',
+                    { headers: {"Authorization" : token}}
+                )
+                const {success} = response.data
+                const nickname = response.data.result
+                if(success){
+                    this.props.navigation.navigate('Home',{
+                        token: token,
+                        nickname: nickname
+                    })
+                }
             }else{
-                alert('아이디와 비밀번호를 확인해주세요')
+                alert('이메일과 비밀번호를 확인해주세요')
             }
         }else{
-            this.props.navigation.navigate('Home')
-            //alert('이메일과 패스워드를 입력해주세요')
+            //this.props.navigation.navigate('Home')
+            alert('이메일과 비밀번호를 입력해주세요')
         }
     }
     async loginCheck() {
