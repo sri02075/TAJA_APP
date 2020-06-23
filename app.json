@@ -25,6 +25,10 @@
     "ios": {
       "supportsTablet": true
     },
+    "android": {
+      "package": "com.countap.TAJA",
+      "versionCode": 1
+    },
     "web": {
       "favicon": "./assets/images/favicon.png"
     }
