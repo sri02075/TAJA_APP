@@ -221,7 +221,7 @@ function ModalCreateChat(props){
                     </View>
                     <View style={styles.modal_time_area}>
                         <View style={styles.modal_timePicker_wrapper}>
-                        <TimePicker />
+                        {/* <TimePicker /> */}
                         </View>
                         <View style={styles.modal_button_area}>
                             <Button titleStyle={{color:'black'}} type="clear" title="취소" onPress={()=>props.toggleModalCreateChat()} />

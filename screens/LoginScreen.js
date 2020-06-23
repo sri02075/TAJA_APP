@@ -36,6 +36,7 @@ export default class LoginScreen extends Component {
         }
         checkJWT()
     }
+
     componentDidMount() {
         console.log(this.props.navigation,this.props.route)
         /* const resetAction = StackActions.reset({
@@ -49,10 +50,12 @@ export default class LoginScreen extends Component {
         const inputData = this.state
         if(inputData.email !== '' && inputData.password !== ''){
             this.setState({spinner:!this.state.spinner})
+            console.log('access1')
             const response = await this.loginCheck()
             const {result,success} = response.data
             if(success){
                 //alert(result.token)
+                console.log('access2')
                 await deviceStorage.saveItem('JWT', result.token)
                 const token = await deviceStorage.getItem('JWT')
                 const response = await axios.get(
@@ -70,10 +73,12 @@ export default class LoginScreen extends Component {
                 }
             }else{
                 alert('이메일과 비밀번호를 확인해주세요')
+                this.setState({spinner:!this.state.spinner})
             }
         }else{
             //this.props.navigation.navigate('Home')
             alert('이메일과 비밀번호를 입력해주세요')
+            this.setState({spinner:!this.state.spinner})
         }
     }
     async loginCheck() {
