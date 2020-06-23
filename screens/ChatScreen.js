@@ -33,7 +33,7 @@ export default class ChatScreen extends React.Component {
             chatHistory : [],
             participants : [],
             inputChat : '',
-            defaultIcon : '../메이커스/1x/어플아이콘.png',
+            defaultIcon : '../assets/images/taja_logo.png',
         }
 
         const channelHandler = new this.sb.ChannelHandler()
@@ -204,7 +204,7 @@ class ChatContentByOther extends React.Component {
         return(
             <View style={styles.chatContent_area}>
                 <View style={styles.icon_wrapper}>
-                    <Image style={styles.image_icon} source={require('../메이커스/1x/어플아이콘.png')} />
+                    <Image style={styles.image_icon} source={require('../assets/images/taja_logo.png')} />
                 </View>
                 <View style={styles.contents_wrapper}>
                     <View style={styles.nickname_wrapper}>

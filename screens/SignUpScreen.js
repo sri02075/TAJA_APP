@@ -1,9 +1,10 @@
 import React,{Component} from 'react'
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View , Keyboard} from 'react-native'
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize"
+import { Image, StyleSheet, Text, TouchableOpacity, View , Keyboard} from 'react-native'
+import { RFPercentage } from "react-native-responsive-fontsize"
 import { Input , Button } from 'react-native-elements'
 //import Toast from 'react-native-simple-toast'
 import axios from 'axios'
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class SignupScreen extends Component {
     constructor(props){
@@ -15,6 +16,7 @@ export default class SignupScreen extends Component {
                 password: '',
                 password_confirm : '',
             },
+            spinner: false,
             appearKeyboard  : false,
         }
     }
@@ -40,6 +42,7 @@ export default class SignupScreen extends Component {
             alert('비밀번호가 일치하지 않습니다.')
             return
         }
+        this.setState({spinner:!this.state.spinner})
         const response = await axios.post(
             'https://api.taja.awmaker.com/user',
             this.state.formData
@@ -48,11 +51,17 @@ export default class SignupScreen extends Component {
             alert(response.data.errorString)
             return
         }
+        this.setState({spinner:!this.state.spinner})
         this.props.navigation.pop()
     }
     render(){
         return (
         <View style={styles.container}>
+            <Spinner
+                visible={this.state.spinner}
+                textContent={'Loading...'}
+                textStyle={{color: '#FFF'}}
+            />
             <View style={styles.logo_area}>
             <Image
                 source={require('../assets/images/taja_logo.png')}

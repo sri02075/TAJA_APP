@@ -1,9 +1,10 @@
 import React,{Component} from 'react'
-import { Image, Platform, StyleSheet,PixelRatio, Text, TouchableOpacity, View ,ScrollView ,Keyboard} from 'react-native'
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize"
-import { Input , Button, withTheme } from 'react-native-elements'
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { RFPercentage } from "react-native-responsive-fontsize"
+import { Input , Button } from 'react-native-elements'
 import axios from 'axios'
 import deviceStorage from '../deviceStorage.js';
+import Spinner from 'react-native-loading-spinner-overlay';
 
 export default class LoginScreen extends Component {
     constructor(props) {
@@ -11,6 +12,7 @@ export default class LoginScreen extends Component {
         this.state = {
             email : '',
             password : '',
+            spinner: false,
         }
         /*jwt check function*/
         const checkJWT = async () => {
@@ -46,6 +48,7 @@ export default class LoginScreen extends Component {
     async loginUser() {
         const inputData = this.state
         if(inputData.email !== '' && inputData.password !== ''){
+            this.setState({spinner:!this.state.spinner})
             const response = await this.loginCheck()
             const {result,success} = response.data
             if(success){
@@ -58,6 +61,7 @@ export default class LoginScreen extends Component {
                 )
                 const {success} = response.data
                 const nickname = response.data.result
+                this.setState({spinner:!this.state.spinner})
                 if(success){
                     this.props.navigation.navigate('Home',{
                         token: token,
@@ -86,7 +90,11 @@ export default class LoginScreen extends Component {
     render() {
         return (
             <View style={styles.container}>
-                {/* <ScrollView style={{flex: 1}} keyboardShouldPersistTaps="always"> */}
+                <Spinner
+                    visible={this.state.spinner}
+                    textContent={'Loading...'}
+                    textStyle={{color: '#FFF'}}
+                />
                 <Image
                     source={require('../assets/images/taja_logo.png')}
                     style={styles.logo_img}

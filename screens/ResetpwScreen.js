@@ -1,7 +1,7 @@
 import React,{Component} from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View ,Keyboard} from 'react-native';
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize";
-import { Input , Button, withTheme } from 'react-native-elements';
+import { Image, StyleSheet, Text, View ,Keyboard} from 'react-native';
+import { RFPercentage } from "react-native-responsive-fontsize";
+import { Input , Button } from 'react-native-elements';
 
 export default class ResetpwScreen extends Component {
     constructor(props){

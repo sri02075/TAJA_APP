@@ -27,7 +27,8 @@
     },
     "android": {
       "package": "com.countap.TAJA",
-      "versionCode": 1
+      "versionCode": 1,
+      "permissions": []
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
