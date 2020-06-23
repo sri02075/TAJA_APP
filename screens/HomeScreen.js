@@ -164,7 +164,7 @@ export default class HomeScreen extends React.Component {
                             </TouchableOpacity>
                         </View>
                         <View style={styles.profile_wrapper}>
-                            <TouchableOpacity style={styles.bottom_icon_wrapper} onPress={() => this.props.navigation.navigate('ResetPw')}>
+                            <TouchableOpacity style={styles.bottom_icon_wrapper} onPress={() => {}}>
                                 <Icon
                                     name="user-o"
                                     size={28}
