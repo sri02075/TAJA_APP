@@ -17,7 +17,6 @@ export default class HomeScreen extends React.Component {
         super(props)
         // this.nickname = this.props.route.params.nickname
         this.state = {
-            ChattingRoomList : [1,2,3,4,5,6,7],
             ModalCreateChatVisible : false,
             ModalEnterChatVisible : false,
             appearKeyboard  : false,
@@ -25,7 +24,12 @@ export default class HomeScreen extends React.Component {
             selectedEndLocation : '',
             selectedTime : '09:00 AM',
             selectedChattingRoom : {},
+<<<<<<< HEAD
             chattingRoomList2 : [],
+=======
+            chattingRoomList : [],
+            userName : this.getNickname()
+>>>>>>> ffae57980228baeb444874cc5c7f9f5bde6307a6
         }
 
         const {token,nickname} = this.props.route.params
@@ -114,7 +118,7 @@ export default class HomeScreen extends React.Component {
                 return;
             }
             This.setState({
-                chattingRoomList2 : openChannels
+                chattingRoomList : openChannels
             })
         })
     }
@@ -130,7 +134,7 @@ export default class HomeScreen extends React.Component {
         return (
             <View style={styles.container}>
                 <ScrollView onRefresh={()=>alert('hello')}>
-                    {this.renderChattingRooms(this.state.chattingRoomList2)}
+                    {this.renderChattingRooms(this.state.chattingRoomList)}
                 </ScrollView>
                 <Button
                     icon={
