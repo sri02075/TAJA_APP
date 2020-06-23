@@ -49,6 +49,7 @@ export default class SignupScreen extends Component {
         )
         if(!response.data.success){
             alert(response.data.errorString)
+            this.setState({spinner:!this.state.spinner})
             return
         }
         this.setState({spinner:!this.state.spinner})
