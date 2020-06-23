@@ -15,6 +15,7 @@ import { StackActions, NavigationActions } from 'react-navigation';
 export default class HomeScreen extends React.Component {
     constructor(props){
         super(props)
+        // this.nickname = this.props.route.params.nickname
         this.state = {
             ModalCreateChatVisible : false,
             ModalEnterChatVisible : false,
@@ -23,36 +24,45 @@ export default class HomeScreen extends React.Component {
             selectedEndLocation : '',
             selectedTime : '09:00 AM',
             selectedChattingRoom : {},
+<<<<<<< HEAD
+            chattingRoomList2 : [],
+=======
             chattingRoomList : [],
             userName : this.getNickname()
+>>>>>>> ffae57980228baeb444874cc5c7f9f5bde6307a6
         }
-        this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
-        this.sb.connect(this.state.userName, (user, error) => {})
-        this.props.navigation.setOptions(header)
-    }
-    componentDidMount() {
-        if(this.props.route.params.substring(0,6) !== 'Bearer'){
+
+        const {token,nickname} = this.props.route.params
+        this.nickname= nickname
+        if(token.substring(0,6) !== 'Bearer'){
             this.props.navigation.dispatch(
                 CommonActions.reset({
                     index: 1,
                     routes: [
-                    { name: 'Home',key: null,params:'Bearer '+this.props.route.params },
+                    { name: 'Home',key: null,params:{token: `Bearer ${token}`,nickname : nickname}},
                     ],
                 })
             )
         }
+
+        this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
+        this.sb.connect(this.nickname, (user, error) => {})
+        this.props.navigation.setOptions(header)
+    }
+    componentDidMount() {
         this.handleRefresh()
     }
     selectStartLocation(location) {
         this.setState({selectedStartLocation:location})
     }
-    async getNickname() {
-        const token =this.props.route.params
-        const response = await axios.get(
+    getNickname() {
+        const This=this
+        const {token} =this.props.route.params
+        let nickname
+        return axios.get(
             'https://api.taja.awmaker.com/user',
             { headers: {"Authorization" : token}}
         )
-        return response.data.result
     }
     selectEndLocation(location) {
         this.setState({selectedEndLocation:location})
@@ -66,7 +76,7 @@ export default class HomeScreen extends React.Component {
     }
     createChattingRoom() {
         const data = {
-            adminName : this.state.userName,
+            adminName : this.nickname,
             startTime : '09:00 AM',
             startLocation : this.state.selectedStartLocation,
             arriveLocation : this.state.selectedEndLocation,
@@ -90,7 +100,7 @@ export default class HomeScreen extends React.Component {
         return chattingRoomList.map((channel,idx)=>{
             const info = JSON.parse(channel.data)
             const channelData = {
-                userName : this.state.userName,
+                userName : this.nickname,
                 url : channel.url,
                 startTime : info.startTime,
                 startLocation : info.startLocation,
