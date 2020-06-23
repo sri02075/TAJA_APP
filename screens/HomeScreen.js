@@ -24,12 +24,7 @@ export default class HomeScreen extends React.Component {
             selectedEndLocation : '',
             selectedTime : '09:00 AM',
             selectedChattingRoom : {},
-<<<<<<< HEAD
-            chattingRoomList2 : [],
-=======
             chattingRoomList : [],
-            userName : this.getNickname()
->>>>>>> ffae57980228baeb444874cc5c7f9f5bde6307a6
         }
 
         const {token,nickname} = this.props.route.params
@@ -54,15 +49,6 @@ export default class HomeScreen extends React.Component {
     }
     selectStartLocation(location) {
         this.setState({selectedStartLocation:location})
-    }
-    getNickname() {
-        const This=this
-        const {token} =this.props.route.params
-        let nickname
-        return axios.get(
-            'https://api.taja.awmaker.com/user',
-            { headers: {"Authorization" : token}}
-        )
     }
     selectEndLocation(location) {
         this.setState({selectedEndLocation:location})
