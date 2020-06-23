@@ -1,16 +1,14 @@
-import * as WebBrowser from 'expo-web-browser';
 import * as React from 'react';
-import { Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { RFPercentage, RFValue } from "react-native-responsive-fontsize"
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { RFValue } from "react-native-responsive-fontsize"
 import { Button } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ScrollView } from 'react-native-gesture-handler';
 import Modal from 'react-native-modal';
 import Select from 'react-native-picker-select';
 import { CommonActions } from '@react-navigation/native';
+import TimePicker from 'react-native-simple-time-picker';
 import SendBird from 'sendbird'
-import axios from 'axios';
-import { StackActions, NavigationActions } from 'react-navigation';
 
 export default class HomeScreen extends React.Component {
     constructor(props){
@@ -222,6 +220,9 @@ function ModalCreateChat(props){
                         </View>
                     </View>
                     <View style={styles.modal_time_area}>
+                        <View style={styles.modal_timePicker_wrapper}>
+                        <TimePicker />
+                        </View>
                         <View style={styles.modal_button_area}>
                             <Button titleStyle={{color:'black'}} type="clear" title="취소" onPress={()=>props.toggleModalCreateChat()} />
                             <View style={{width:16}}></View>
@@ -242,7 +243,7 @@ function ModalEnterChat(props){
                     <View style={styles.modal_title_area}>
                         <Text style={styles.text_modal_title}>동행 요청</Text>
                     </View>
-                    <View style={styles.modal_location_area}>
+                    <View style={styles.modal_description_area}>
                         <View style={styles.modal_startLocation_wrapper}>
                             <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
                                 <Text style={{fontSize:RFValue(16)}}>출발</Text>
@@ -268,7 +269,7 @@ function ModalEnterChat(props){
                             </View>
                         </View>
                     </View>
-                    <View style={styles.modal_time_area}>
+                    <View style={styles.modal_last_area}>
                         <View style={styles.modal_button_area}>
                             <Button titleStyle={{color:'black'}} type="clear" title="취소" onPress={()=>props.toggleModalEnterChat()} />
                             <View style={{width:16}}></View>
@@ -362,10 +363,18 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     modal_location_area: {
-        flex:10,
+        flex:5,
         /* backgroundColor:"yellow", */
     },
     modal_time_area: {
+        flex:9,
+        /* backgroundColor:"blue", */
+    },
+    modal_description_area: {
+        flex:10,
+        /* backgroundColor:"yellow", */
+    },
+    modal_last_area: {
         flex:4,
         /* backgroundColor:"blue", */
     },
@@ -374,6 +383,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'flex-end',
         justifyContent: 'flex-end',
+    },
+    modal_timePicker_wrapper: {
+        flex:6,
     },
     row: {
         height : 100,
