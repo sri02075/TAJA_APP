@@ -15,9 +15,18 @@ export default class LoginScreen extends Component {
         /*jwt check function*/
         const checkJWT = async () => {
             try {
+                /*토큰 가져온후 토큰 유효성검사 user*/
                 const token = await deviceStorage.getItem('JWT')
-                if(token){
-                    this.props.navigation.navigate('Home',token)
+                const response = await axios.get(
+                    'https://api.taja.awmaker.com/user',
+                    { headers: {"Authorization" : token}}
+                )
+                const {result, success} = response.data
+                if(success){
+                    this.props.navigation.navigate('Home',{
+                        token: token,
+                        nickname: result
+                    })
                 }
             }catch(err){
                 console.log(err)
