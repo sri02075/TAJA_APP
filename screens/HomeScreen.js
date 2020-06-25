@@ -129,15 +129,14 @@ export default class HomeScreen extends React.Component {
             This.toggleModalCreateChat()
             this.setState({spinner:!this.state.spinner})
             openChannel.createMetaData(data).then((res)=>{
-                this.props.navigation.navigate('Chat', data)
+                this.props.navigation.navigate('Chat', {channelData: data, myName: this.nickname})
             })
         })
     }
 
     enterChattingRoom(){
         this.setState({ModalEnterChatVisible : !this.state.ModalEnterChatVisible})
-        //console.log(this.state.selectedChattingRoom)
-        this.props.navigation.navigate('Chat', this.state.selectedChattingRoom)
+        this.props.navigation.navigate('Chat', {channelData: this.state.selectedChattingRoom, myName: this.nickname})
     }
 
 
