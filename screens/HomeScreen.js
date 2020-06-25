@@ -115,6 +115,7 @@ export default class HomeScreen extends React.Component {
 
     handleRefresh(){
         this.setState({isRefreshing: !this.state.isRefreshing})
+        console.log()
         let openChannelListQuery = this.sb.OpenChannel.createOpenChannelListQuery();
         
         const self=this
