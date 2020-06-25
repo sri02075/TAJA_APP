@@ -3,19 +3,16 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React,{useState}  from 'react';
 import { Platform, StatusBar, StyleSheet, View ,Keyboard } from 'react-native';
 import useCachedResources from './hooks/useCachedResources';
-import MainTabNavigator from './navigation/MainTabNavigator';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
 import SignUpScreen from './screens/SignUpScreen';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import ResetpwScreen from './screens/ResetpwScreen';
 import ChatScreen from './screens/ChatScreen'
-import deviceStorage from './deviceStorage.js';
 
 const Stack = createStackNavigator();
 
 export default function App(props) {
-    const [token,setToken] = useState('test');
     const isLoadingComplete = useCachedResources();
 
     const updateToken = (token)=>{
