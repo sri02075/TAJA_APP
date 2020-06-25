@@ -258,7 +258,7 @@ export default class ChatScreen extends React.Component {
                 <ScrollView
                     syle={{transform: [{ scaleY: -1 }]}}
                     ref={ref => this.scrollview = ref}
-                    onContentSizeChange={this.onContentSizeChangeHandler.bind(this)} 
+                    onContentSizeChange={this.onContentSizeChangeHandler.bind(this)}
                 >
                     <View>{this.renderChat()}</View>
                 </ScrollView>
