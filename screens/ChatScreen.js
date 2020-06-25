@@ -233,19 +233,9 @@ export default class ChatScreen extends React.Component {
                 isType={1}
                 cancle={() => {cancle()}}
                 ok={() => {
-                    // self.sb.OpenChannel.getChannel(this.channelData.url, (openChannel, error)=> {
-                    //     let data = JSON.parse(openChannel.data)
-                    //     data.isFrozen = true
-                    //     // console.log(openChannel)
-                        
-                    //     // // openChannel.updateChannel("", "", JSON.stringify(data), (op,error)=>{
-                    //     // //     console.log(error)
-                    //     // // })
-                    //     openChannel.updateChannelWithOperatorUserIds("", "", JSON.stringify(data), (op,error)=>{
-                    //         console.log(error)
-                    //     })
-
-                    // })
+                    self.sb.OpenChannel.getChannel(this.channelData.url, (openChannel, error) => {
+                        openChannel.updateMetaData({isFrozen: 'true'})
+                    })
                 }}
                 text={"모집을 완료하시겠습니까?"} />,
             <ModalConfirm

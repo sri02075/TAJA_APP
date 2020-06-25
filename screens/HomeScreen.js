@@ -23,7 +23,7 @@ export default class HomeScreen extends React.Component {
             selectedMeridiem : 'AM',
             selectedTime : 1593189000000,
             selectedChattingRoom : {},
-            chattingRoomList : [],
+            chattingRooms : [],
             isRefreshing: true,
         }
 
@@ -86,7 +86,10 @@ export default class HomeScreen extends React.Component {
             }
             This.handleRefresh()
             This.toggleModalCreateChat()
+
+            openChannel.createMetaData(data)
         })
+        
     }
 
     enterChattingRoom(){
@@ -94,39 +97,43 @@ export default class HomeScreen extends React.Component {
         this.props.navigation.navigate('Chat', this.state.selectedChattingRoom)
     }
 
+    getChattingRooms(){
+        
+    }
+
     renderChattingRooms(){
-        const self = this
-        return this.state.chattingRoomList.map((channel,idx)=>{
-            const info = JSON.parse(channel.data)
-            const channelData = {
-                userName : this.nickname,
-                url : channel.url,
-                startTime : info.startTime,
-                startLocation : info.startLocation,
-                arriveLocation : info.arriveLocation,
-                isFrozen: info.isFrozen
+        return this.state.chattingRooms.map((channelData, idx)=>{
+            if(!channelData.url){
+                return <View key={idx} />
             }
-            return (info.isFrozen) 
-                ? <ChattingRoom key={idx} channelData={channelData} handlePressList={(channelData)=>this.handlePressList(channelData)} />
-                : <View />
+            
+            return ((channelData.isFrozen)==='false')
+            ? <ChattingRoom key={idx} channelData={channelData} handlePressList={(channelData)=>this.handlePressList(channelData)} />
+            : <View key={idx} />
         })
     }
 
     handleRefresh(){
         this.setState({isRefreshing: !this.state.isRefreshing})
+        console.log()
         let openChannelListQuery = this.sb.OpenChannel.createOpenChannelListQuery();
-        const This = this
-        openChannelListQuery.next(function(openChannels, error) {
-            if (error) {
-                return;
-            }
-            This.setState({
-                chattingRoomList : openChannels,
-                isRefreshing: !This.state.isRefreshing,
+        
+        const self=this
+
+        this.setState({
+            chattingRooms: []
+        })
+        openChannelListQuery.next((openChannels, error) => {
+            openChannels.forEach((openChannel,idx)=>{
+                openChannel.getAllMetaData((response)=>{
+                    this.setState({
+                        chattingRooms: [...this.state.chattingRooms, response]
+                    })
+                })
             })
+            this.setState({isRefreshing: !this.state.isRefreshing})
         })
     }
-
     toggleModalCreateChat = () => {
         this.setState({ModalCreateChatVisible: !this.state.ModalCreateChatVisible})
     }

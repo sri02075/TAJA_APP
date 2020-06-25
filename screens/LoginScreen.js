@@ -42,8 +42,8 @@ export default class LoginScreen extends Component {
     }
     async loginUser() {
         const inputData = this.state
+        this.setState({spinner:!this.state.spinner})
         if(inputData.email !== '' && inputData.password !== ''){
-            this.setState({spinner:!this.state.spinner})
             console.log('access1')
             const response = await this.loginCheck()
             const {result,success} = response.data
@@ -67,7 +67,7 @@ export default class LoginScreen extends Component {
                 }
             }else{
                 alert('이메일과 비밀번호를 확인해주세요')
-                this.setState({spinner:!this.state.spinner})
+                this.setState({spinner:false})
             }
         }else{
             //this.props.navigation.navigate('Home')
