@@ -8,6 +8,7 @@ import Select from 'react-native-picker-select';
 import { CommonActions } from '@react-navigation/native';
 import SendBird from 'sendbird'
 
+const today = new Date()
 export default class HomeScreen extends React.Component {
     constructor(props){
         super(props)
@@ -18,8 +19,8 @@ export default class HomeScreen extends React.Component {
             appearKeyboard  : false,
             selectedStartLocation : '',
             selectedEndLocation : '',
-            selectedHours: 8,
-            selectedMinutes: 30,
+            selectedHours: today.getHours(),
+            selectedMinutes: undefined,
             selectedMeridiem : 'AM',
             selectedTime : 1593189000000,
             selectedChattingRoom : {},
@@ -53,8 +54,8 @@ export default class HomeScreen extends React.Component {
     selectEndLocation(location) {
         this.setState({selectedEndLocation:location})
     }
-    selectHour(selectedHour) {
-        this.setState({selectedHour})
+    selectHour(selectedHours) {
+        this.setState({selectedHours})
     }
     selectMinutes(selectedMinutes) {
         this.setState({selectedMinutes})
@@ -72,6 +73,11 @@ export default class HomeScreen extends React.Component {
         })
     }
     createChattingRoom() {
+        const {selectedHours,selectedMinutes,selectedMeridiem} = this.state
+        if(!selectedHours || !selectedMinutes || !selectedMinutes) {
+            alert('시간은 설정해주세요!')
+            return
+        }
         const data = {
             adminName : this.nickname,
             startTime : this.state.selectedTime,
@@ -177,8 +183,11 @@ export default class HomeScreen extends React.Component {
                                     selectStartLocation={(value)=>this.selectStartLocation(value)}
                                     selectEndLocation={(value)=>this.selectEndLocation(value)}
                                     selectHour={(value)=>this.selectHour(value)}
+                                    selectedHours={this.state.selectedHours}
                                     selectMinutes={(value)=>this.selectMinutes(value)}
+                                    selectedMinutes={this.state.selectedMinutes}
                                     selectMeridiem={(value)=>this.selectMeridiem(value)}
+                                    selectedMeridiem={this.state.selectedMeridiem}
                                     createChattingRoom={()=>this.createChattingRoom()}/>
                             </TouchableOpacity>
                         </View>
@@ -199,7 +208,7 @@ export default class HomeScreen extends React.Component {
 function ModalCreateChat(props){
     const hourItem = ()=>{
         const hourItemArray = []
-        for(let i=1; i<=12; i++){
+        for(let i=0; i<=12; i++){
             hourItemArray.push({label: `${i<10 ? '0'+i : i}`, value: i})
         }
         return hourItemArray
@@ -257,34 +266,36 @@ function ModalCreateChat(props){
                     </View>
                     <View style={styles.modal_time_area}>
                         <View style={styles.modal_timePicker_wrapper}>
-                            <View style={{flex:2,backgroundColor:'red',justifyContent: 'center',alignItems:'center'}}><Text style={{fontSize:RFValue(16)}}>시각</Text></View>
-                            <View style={{flex:2,backgroundColor:'blue',justifyContent: 'center',alignItems:'center'}}>
+                            <View style={{flex:2,justifyContent: 'center',alignItems:'center'}}><Text style={{fontSize:RFValue(16)}}>시각</Text></View>
+                            <View style={{flex:2,justifyContent: 'center',alignItems:'center'}}>
                                 <Select
                                     onValueChange={(value) => props.selectHour(value)}
-                                    placeholder={{ label: '시간',value :null,color: '#CCCCCC'}}
-                                    style={{flex:1,paddingLeft:15}}
+                                    placeholder={{ label: '시',value :null,color: '#CCCCCC'}}
+                                    style={{}}
                                     items={hourItem()}
                                 />
+                                <Text style={{position: 'absolute',left:10}}>{props.selectedHours < 10 ? '0'+props.selectedHours : props.selectedHours}</Text>
                             </View>
-                            <View style={{flex:2,backgroundColor:'green',justifyContent: 'center',alignItems:'center'}}>
+                            <View style={{flex:2,justifyContent: 'center',alignItems:'center'}}>
                                 <Select
                                     onValueChange={(value) => props.selectMinutes(value)}
                                     placeholder={{ label: '분',value :null,color: '#CCCCCC'}}
-                                    style={{flex:1,paddingLeft:15}}
+                                    style={{}}
                                     items={minutesItem()}
-                                    useNativeAndroidPickerStyle={false}
                                 />
+                                <Text style={{position: 'absolute',left:10}}>{props.selectedMinutes}</Text>
                             </View>
-                            <View style={{flex:2,backgroundColor:'yellow',justifyContent: 'center',alignItems:'center'}}>
+                            <View style={{flex:2,justifyContent: 'center',alignItems:'center'}}>
                                 <Select
                                     onValueChange={(value) => props.selectMeridiem(value)}
                                     placeholder={{ label: 'AM,PM',value :null,color: '#CCCCCC'}}
-                                    style={{flex:1,paddingLeft:15}}
+                                    style={{}}
                                     items={[
                                         {label:'AM',value:'AM'},
                                         {label:'PM',value:'PM'}
                                     ]}
                                 />
+                                <Text style={{position: 'absolute',left:5}}>{props.selectedMeridiem}</Text>
                             </View>
                             {/* <TimePicker onTimeSelected={(date)=>{props.onChange(date)}}/> */}
                         </View>
@@ -480,7 +491,6 @@ const styles = StyleSheet.create({
     modal_time_area: {
         flex:5,
         marginTop: 10,
-        backgroundColor:'red'
     },
     modal_description_area: {
         flex:5,
