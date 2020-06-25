@@ -39,7 +39,7 @@ export default class ChatScreen extends React.Component {
             isFrozen: false,
             isModalVisible: false,
             selectedModal: 0,
-            payList : [],
+            payList : [1389,1389,1389,1388],
             user_count: 0,
         }
         
@@ -227,10 +227,9 @@ export default class ChatScreen extends React.Component {
     getDutchPayMessage(){
         const {payList} = this.state
         const result = payList.reduce((acc,cur,idx)=>{
-            const str = `${idx+1} 님 : ${cur}원\n`
+            const str = `${idx+1}번째 멤버 : ${cur}원\n`
             return acc+str
         },'')
-        console.log(result)
         return result
     }
 
@@ -289,9 +288,8 @@ export default class ChatScreen extends React.Component {
                 isType={2}
                 cancle={() => {cancle()}}
                 user_count={this.state.user_count}
-                changePayList = {(payList)=>this.setState({payList:payList})}
+                changePayList = {(payList)=>this.setState({payList:payList},()=>{this.sendCustomMessage(this.getDutchPayMessage());cancle()})}
                 ok={() => {cancle()}}
-                sendDutchMessage={()=>{this.sendCustomMessage(this.getDutchPayMessage());cancle()}}
                 text={"더치페이"} />,
             <ModalConfirm
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==3)}
@@ -409,7 +407,6 @@ class ModalConfirm extends React.Component {
             const payList =this.calculatePay(this.state.totalPay,this.props.user_count)
             this.props.changePayList(payList)
             this.input_pay.current.clear()
-            this.props.sendDutchMessage()
             return
         }
         this.props.ok()

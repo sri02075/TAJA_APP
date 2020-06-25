@@ -145,7 +145,7 @@ export default class HomeScreen extends React.Component {
                 return <View key={idx} />
             }
             return ((channelData.isFrozen)==='false')
-            ? <ChattingRoom key={idx} channelData={channelData} handlePressList={(channelData)=>this.handlePressList(channelData)} />
+            ? <ChattingRoom key={idx} nickname = {this.nickname} channelData={channelData} handlePressList={(channelData)=>this.handlePressList(channelData)} />
             : <View key={idx} />
         })
     }
@@ -179,7 +179,7 @@ export default class HomeScreen extends React.Component {
                     startLocation: "출발 지역",
                     startTime: "합승 출발 시각",
                     url: "채널 url",
-                    userName: "생성 유저 네임"
+                    userName: "사용중인 유저 네임"
             } */
             self.setState({isRefreshing: !self.state.isRefreshing})
         })
@@ -411,7 +411,7 @@ class ChattingRoom extends React.Component {
     constructor(props){
         super(props)
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
-        this.sb.connect('익명이', (user, error) => {})
+        this.sb.connect(this.props.nickname, (user, error) => {})
         this.remaingTime = this.getRemainingTime(this.props.channelData.startTime)
     }
     getRemainingTime(departureTime){
