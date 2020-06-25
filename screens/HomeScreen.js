@@ -106,6 +106,7 @@ export default class HomeScreen extends React.Component {
 
         if(startTime - curTime < (1000 * 60 * 5)){
             alert('시간이 너무 촉박합니다\n다시 설정해주세요')
+            this.setState({spinner:!this.state.spinner})
             return
         }
         const This = this
@@ -123,7 +124,7 @@ export default class HomeScreen extends React.Component {
                 isFrozen : 'false',
                 url: openChannel.url
             }
-            console.log(data)
+            // console.log(data)
             //This.handleRefresh()
             This.toggleModalCreateChat()
             this.setState({spinner:!this.state.spinner})
@@ -135,6 +136,7 @@ export default class HomeScreen extends React.Component {
 
     enterChattingRoom(){
         this.setState({ModalEnterChatVisible : !this.state.ModalEnterChatVisible})
+        //console.log(this.state.selectedChattingRoom)
         this.props.navigation.navigate('Chat', this.state.selectedChattingRoom)
     }
 

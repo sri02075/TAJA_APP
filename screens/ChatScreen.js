@@ -13,6 +13,8 @@ export default class ChatScreen extends React.Component {
         super(props)
         const self = this
         this.channelData = this.props.route.params
+        console.log('-------------------start--------------------------')
+        console.log(this.props.route.params)
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.channelHandler = new this.sb.ChannelHandler()
         console.log(this.channelData.userName)
@@ -26,7 +28,7 @@ export default class ChatScreen extends React.Component {
                 if (error) {
                     return
                 }
-                self.setState({ memberNum: self.channel.participantCount })
+                self.setState({ user_count: self.channel.participantCount })
             })
         })
 
@@ -49,7 +51,7 @@ export default class ChatScreen extends React.Component {
         this.channelHandler.onUserEntered = (channel, message) => {
             self.setState({ memberNum: self.channel.participantCount })
             channel.getMetaData(["userList"],(response, error) => {
-                console.log(self.channelData.userNamesd)
+                console.log(self.channelData.userName)
                 if(response.userList==null){
                     self.channel.createMetaData({userList: JSON.stringify({userList: [self.channelData.userName]})})
                     self.setState({ userList: [self.channelData.userName] })
