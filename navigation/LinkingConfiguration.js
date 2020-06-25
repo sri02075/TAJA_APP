@@ -24,6 +24,9 @@ export default {
     },
     Home : {
       path : 'home'
+    },
+    Profile: {
+      path: 'home/profile',
     }
   },
 };
