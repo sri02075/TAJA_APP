@@ -712,4 +712,4 @@ const styles = StyleSheet.create({
         height : '75%',
         resizeMode : 'contain',
     }
-});
+})

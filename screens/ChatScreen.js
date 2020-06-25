@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Image, Platform, BackHandler, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, TextInput, BackHandler, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import {RFValue } from "react-native-responsive-fontsize"
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -15,13 +15,14 @@ export default class ChatScreen extends React.Component {
         this.channelData = this.props.route.params
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.channelHandler = new this.sb.ChannelHandler()
+        
 
         this.sb.connect(this.channelData.userName, (user, error) => {})
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
                 return;
             }
-
+            self.channel = openChannel
             openChannel.enter(function(response, error) {
                 if (error) {
                     return;
@@ -32,7 +33,7 @@ export default class ChatScreen extends React.Component {
 
         this.state = {
             chatHistory : [],
-            participants : [],
+            members : [],
             inputChat : '',
             defaultIcon : '../assets/images/taja_logo.png',
             isPlus: false,
@@ -42,12 +43,32 @@ export default class ChatScreen extends React.Component {
             payList : [],
             user_count: 4,
         }
-
-        this.channelHandler.onMessageReceived = function(channel, message) {
+        
+        this.channelHandler.onMessageReceived = (channel, message) => {
             self.chatRefresh()
         }
-        this.channelHandler.onUserEntered = function(channel, message) {
-            // self.chatRefresh()
+        this.channelHandler.onUserEntered = (channel, message) => {
+            channel.getMetaData(["userList"],(response, error) => {
+                // console.log(response.userList)
+                if(response.userList==null){
+                    self.channel.createMetaData({userList: JSON.stringify({userList: [self.channelData.userName]})})
+                    self.setState({ userList: [self.channelData.userName] })
+                } else {
+                    const userList = JSON.parse(response.userList).userList
+                    if(!userList.includes(self.channelData.userName)){
+                        // console.log(`${response.userList}_${self.channelData.userName}`)
+                        
+                        self.channel.updateMetaData({userList: JSON.stringify({userList: [...userList, self.channelData.userName]})})
+                    }
+                }  
+            })
+        }
+        this.channelHandler.onUserExited = function(channel, message) {
+            console.log(message)
+            // self.setState({
+            //     members: [...self.state.members, ]
+            // })
+            channel.participantCount
         }
         this.sb.addChannelHandler("UNIQUE_KEY", this.channelHandler)
         BackHandler.addEventListener('hardwareBackPress', () => {
@@ -236,7 +257,12 @@ export default class ChatScreen extends React.Component {
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==0)}
                 isType={1}
                 cancle={() => {cancle()}}
-                ok={() => {self.props.navigation.goBack()}}
+                ok={() => {
+                    self.channel.exit((response, error)=>{
+                        // alert(`${self.channelData.userName}님이 나갔습니다.`) // 나감 알림
+                    })
+                    self.props.navigation.goBack()
+                }}
                 text={"채팅을 끝내시겠습니까?"} />,
             <ModalConfirm
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==1)}
@@ -305,7 +331,8 @@ export default class ChatScreen extends React.Component {
                     stickyHeaderIndices={true}
                     syle={{transform: [{ scaleY: -1 }]}}
                     ref={ref => this.scrollview = ref}
-                    onContentSizeChange={this.onContentSizeChangeHandler.bind(this)}
+                    style={styles.chat_area}
+                    onContentSizeChange={this.onContentSizeChangeHandler.bind(this)} 
                 >
                     <View>{this.renderChat()}</View>
                 </ScrollView>
@@ -315,11 +342,11 @@ export default class ChatScreen extends React.Component {
                         <Image style={styles.input_plus} source={require('../assets/images/plus.png')} />
                     </TouchableOpacity>
                     <View style={styles.input_chat_wrapper}>
-                        <Input
-                            inputContainerStyle={styles.inputContainer_input_chat}
-                            inputStyle={styles.inputStyle_input_chat}
+                        <TextInput
                             style={styles.input_chat}
                             value={this.state.inputChat}
+                            selectionColor='#FFB000'
+                            multiline={true}
                             onChangeText={value => this.setState({ inputChat : value })}
                         />
                     </View>
@@ -461,6 +488,7 @@ class PlusCollection extends React.Component {
                         <Text style={styles.btn_gallery_text}>갤러리</Text>
                     </View>
                 </TouchableOpacity>
+                <View style={styles.bar} />
                 <TouchableOpacity style={styles.btn_dutch_wrapper} onPress={()=>{this.props.funcArr[1]()}} >
                     <View style={styles.btn_dutch_icon_wrapper}>
                         <Image style={styles.btn_dutch} source={require('../assets/images/coin.png')} />
@@ -469,9 +497,10 @@ class PlusCollection extends React.Component {
                         <Text style={styles.btn_dutch_text}>더치페이</Text>
                     </View>
                 </TouchableOpacity>
+                <View style={styles.bar} />
                 <TouchableOpacity style={styles.btn_endInvite_wrapper} onPress={()=>{this.props.funcArr[2]()}} >
                     <View style={styles.btn_endInvite_icon_wrapper}>
-                        <Image styl4444444e={styles.btn_endInvite} source={require('../assets/images/stop.png')} />
+                        <Image style={styles.btn_endInvite} source={require('../assets/images/stop.png')} />
                     </View>
                     <View style={styles.btn_endInvite_text_wrapper}>
                         <Text style={styles.btn_endInvite_text}>모집종료</Text>
@@ -536,7 +565,8 @@ const header = {
         backgroundColor: '#0d1f37',
         elevation: 0,
         shadowOpacity: 0,
-        borderBottomWidth: 1,
+        borderBottomWidth: 0,
+        // borderColor:
     },
     headerTintColor: 'white',
     headerTitleStyle: {
@@ -546,53 +576,44 @@ const header = {
 
 const styles = StyleSheet.create({
     input_wrapper: {
+        height: 48,
         flexDirection: 'row',
         backgroundColor: 'white',
     },
     input_plus_wrapper: {
-        flex: 15,
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 50
+        marginTop: '3.148%',
+        marginBottom: '3.518%',
+        marginLeft: '4.629%',
+        marginRight: '3.703%',
+        width: '5.648%',
+        height: '46.511%',
     },
     input_plus: {
-        width: '57.5%',
-        height: '57.5%', //57.5%
-        // borderColor: 'black',
-        // borderWidth: 1,
-        resizeMode: 'center'
+        width: '100%',
+        height: '50%',
+        resizeMode: 'center',
     },
     input_chat_wrapper: {
-        flex: 80,
-        borderWidth: 1,
-        borderColor: 'black',
-    },
-    inputContainer_input_chat: {
-        width: '100%',
-        borderColor: 'white',
-    },
-    inputStyle_input_chat: {
-        width: '100%',
-        borderWidth: 1,
-        borderColor: 'black',
-        color: 'yellow'
+        marginTop: '2.407%',
+        marginBottom: '2.5%',
+        width: '72.962%',
+        paddingBottom: 15
     },
     input_chat: {
         width: '100%',
-        color: 'yellow',
+        fontSize: 20
     },
     input_send_wrapper: {
-        flex: 17,
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: 50
+        marginTop: '2.87%',
+        marginBottom: '2.777%',
+        marginHorizontal: '2.777%',
+        width: '7.314%',
+        height: '52.713%',
     },
     input_send: {
-        width: '57.5%',
-        height: '57.5%', //57.5%
-        // borderColor: 'black',
-        // borderWidth: 1,
-        resizeMode: 'center'
+        width: '100%',
+        height: '50%',
+        resizeMode: 'center',
     },
 
     member_status_wrapper:{
@@ -612,8 +633,6 @@ const styles = StyleSheet.create({
         height: '28.125%',
         width: '75%',
         resizeMode: 'contain',
-        // borderColor: 'black',
-        // borderWidth: 1,
     },
     member_wrapper:{
         flex: 80,
@@ -621,8 +640,6 @@ const styles = StyleSheet.create({
     },
     spread_icon_wrapper:{
         flex: 9,
-        // borderColor: 'black',
-        // borderWidth: 1,
     },
     spread_icon:{
         marginLeft: '5.555%',
@@ -631,16 +648,11 @@ const styles = StyleSheet.create({
         marginVertical: '75.555%',
         height: '15.625%',
         resizeMode: 'contain',
-
-        // borderColor: 'black',
-        // borderWidth: 1,
     },
 
     profile_wrapper: {
         flex: 1,
         flexDirection: 'column',
-        // borderColor: 'black',
-        // borderWidth: 1,
         alignItems: 'center',
     },
     profile_icon_wrapper: {
@@ -676,6 +688,9 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         paddingBottom: 10,
         marginHorizontal: '2%'
+    },
+    chat_area: {
+        paddingVertical : 30
     },
     icon_wrapper: {
         width: '20%',
@@ -814,7 +829,104 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     btn_wrapper: {
+        width: '100%',
+        height: 68,
+        marginBottom: 10,
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
         flexDirection: 'row',
         backgroundColor: 'white',
-    } // 87 15 68, 96.666 16.666 75.555
-});
+    }, // 358 359 358
+    btn_gallery_wrapper:{
+        width: '33.148%',
+    },
+    btn_gallery_icon_wrapper:{
+        marginHorizontal: '39.385%',
+        width: '21.229%',
+        marginTop: '7.821%',
+        marginBottom: '5.027%',
+        height: '42.011%',
+        borderColor: 'black',
+        borderWidth: 1,
+    },
+    btn_gallery:{
+        width: '100%',
+        height: '75%',
+        resizeMode: 'contain'
+    },
+    btn_gallery_text_wrapper:{
+        marginLeft: '41.061%',
+        marginRight: '41.34%',
+        width: '17.877%',
+        borderColor: 'black',
+        borderWidth: 1
+    },
+    btn_dutch_wrapper:{
+        width: '33.148%',
+    },
+    btn_dutch_icon_wrapper:{
+        marginLeft: '37.15%',
+        marginRight: '37.43%',
+        width: '25.418%',
+        marginTop: '7.821%', //28
+        marginBottom: '4.748%', //17
+        height: '42.011%', //71
+        borderColor: 'black',
+        borderWidth: 1,
+    },
+    btn_dutch:{
+        width: '100%',
+        height: '75%',
+        resizeMode: 'contain'
+    },
+    btn_dutch_text_wrapper:{
+        marginLeft: '37.15%',
+        marginRight: '37.43%',
+        width: '25.418%',
+        borderColor: 'black',
+        borderWidth: 1,
+    },
+    // btn_dutch_text:{
+    //     sd,
+    // },
+    btn_endInvite_wrapper:{
+        width: '33.148%',
+    },
+    btn_endInvite_icon_wrapper:{
+        marginLeft: '37.142%',
+        marginRight: '40.782%',
+        width: '24.935%',
+        marginTop: '6.983%',
+        marginBottom: '7.262%',
+        height: '44.97%',
+        borderColor: 'black',
+        borderWidth: 1,
+    },
+    btn_endInvite: {
+        width: '100%',
+        height: '75%',
+        resizeMode: 'contain'
+    },
+    btn_endInvite_text_wrapper:{
+        marginLeft: '38.368%',
+        marginRight: '35.474%',
+        width: '26.256%',
+        borderColor: 'black',
+        borderWidth: 1,
+    },
+    // btn_endInvite_text: {
+    //     sds,
+    // },
+    bar: {
+        width: '0.185%', //2
+        marginTop: '3.055%', //33
+        marginBottom: '3.148%',    // 34
+        height: '59.763%',//101
+        backgroundColor: "#CCCCCC",
+    },
+    underBar: {
+        width: '100%', //2
+        height: '59.763%',//101
+        backgroundColor: "#CCCCCC",
+    },
+})
