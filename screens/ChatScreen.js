@@ -41,8 +41,9 @@ export default class ChatScreen extends React.Component {
             isFrozen: false,
             isModalVisible: false,
             selectedModal: 0,
+
             payList : [],
-            user_count: 4,
+            user_count: 0,
         }
         
         this.channelHandler.onMessageReceived = (channel, message) => {
@@ -228,6 +229,17 @@ export default class ChatScreen extends React.Component {
         
     }
 
+
+    getDutchPayMessage(){
+        const {payList} = this.state
+        const result = payList.reduce((acc,cur,idx)=>{
+            const str = `${idx+1}번째 멤버 : ${cur}원\n`
+            return acc+str
+        },'')
+        return result
+    }
+
+
     renderChat() {
         return this.state.chatHistory.map((chat,idx) =>{
             return (this.channelData.userName===chat.name) ?
@@ -283,7 +295,7 @@ export default class ChatScreen extends React.Component {
                 isType={2}
                 cancle={() => {cancle()}}
                 user_count={this.state.user_count}
-                changePayList = {(payList)=>this.setState({payList:payList})}
+                changePayList = {(payList)=>this.setState({payList:payList},()=>{this.sendCustomMessage(this.getDutchPayMessage());cancle()})}
                 ok={() => {cancle()}}
                 text={"더치페이"} />,
             <ModalConfirm
@@ -404,6 +416,8 @@ class ModalConfirm extends React.Component {
             console.log(JSON.stringify(payList))
             this.props.changePayList(payList)
             this.input_pay.current.clear()
+
+            return
         }
         this.props.ok()
     }
