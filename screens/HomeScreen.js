@@ -152,7 +152,6 @@ export default class HomeScreen extends React.Component {
 
     handleRefresh(){
         this.setState({isRefreshing: !this.state.isRefreshing})
-        console.log()
         let openChannelListQuery = this.sb.OpenChannel.createOpenChannelListQuery();
         const self=this
 
@@ -160,23 +159,27 @@ export default class HomeScreen extends React.Component {
             chattingRooms: []
         })
         openChannelListQuery.next((openChannels, error) => {
-            openChannels.forEach((openChannel,idx)=>{
-                openChannel.getAllMetaData((response)=>{
-                    /* response data 설명
-                    response = {
-                        arriveLocation: "도착시간",
-                        isFrozen: "true or false, 모집완료 유무",
-                        startLocation: "출발 지역",
-                        startTime: "합승 출발 시각",
-                        url: "채널 url",
-                        userName: "생성 유저 네임"
-                    } */
-                    this.setState({
-                        chattingRooms: [...this.state.chattingRooms, response]
+            openChannels.reduce( async (acc,cur)=>{
+                const response = await acc
+                if(response){
+                    self.setState({
+                        chattingRooms: [...self.state.chattingRooms,response]
                     })
-                })
-            })
-            this.setState({isRefreshing: !this.state.isRefreshing})
+                }
+                return cur.getAllMetaData()
+            },Promise).then(response=>self.setState({
+                chattingRooms: [...self.state.chattingRooms,response]
+            }))
+            /* response data 설명
+                response = {
+                    arriveLocation: "도착시간",
+                    isFrozen: "true or false, 모집완료 유무",
+                    startLocation: "출발 지역",
+                    startTime: "합승 출발 시각",
+                    url: "채널 url",
+                    userName: "생성 유저 네임"
+            } */
+            self.setState({isRefreshing: !self.state.isRefreshing})
         })
     }
     toggleModalCreateChat = () => {
@@ -407,6 +410,7 @@ class ChattingRoom extends React.Component {
         super(props)
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.sb.connect('익명이', (user, error) => {})
+        this.remaingTime = this.getRemainingTime(this.props.channelData.startTime)
     }
     getRemainingTime(departureTime){
         if(typeof(departureTime) === 'string') {
@@ -433,7 +437,7 @@ class ChattingRoom extends React.Component {
             return `${minute + 1}분 전`
             }
         } else {
-            return `${hour}시간 ${minute + 1}분 전`
+            return `${hour}시간\n ${minute + 1}분 전`
         }
     }
 
@@ -450,11 +454,14 @@ class ChattingRoom extends React.Component {
         const {hour,minutes,meridiem} = departureTime
         return `${hour<10 ? '0'+hour: hour}:${minutes} ${meridiem}`
     }
+    
     render() {
         /*  */
         return(
             <View style={styles.row}>
-                <TouchableOpacity style={styles.row_wrapper} onPress={()=>this.props.handlePressList(this.props.channelData)} >
+                <TouchableOpacity
+                    style={styles.row_wrapper}
+                    onPress={()=>this.remaingTime !== '모집 종료' ? this.props.handlePressList(this.props.channelData) : null} >
                     <View style={styles.icon_area}>
                         <View style={styles.icon_wrapper}>
                             <Image
@@ -480,7 +487,7 @@ class ChattingRoom extends React.Component {
                     </View>
                     <View style={styles.time_area}>
                         <View style={styles.time_wrapper}>
-                            <Text style={{color:'red'}}> {this.getRemainingTime(this.props.channelData.startTime)}</Text>
+                            <Text style={{color:'red'}}> {this.remaingTime}</Text>
                             <Text style={{color:'gray'}}>{this.parseTime(this.props.channelData.startTime)}</Text>
                         </View>
                     </View>
