@@ -14,7 +14,9 @@ export default class ProfileScreen extends React.Component {
             selected: 0,
         }
     }
-
+    componentDidMount() {
+        this.props.navigation.setOptions(header)
+    }
     toggleModal(i) {
         this.setState({
             isModalVisible: !this.state.isModalVisible,
@@ -29,10 +31,10 @@ export default class ProfileScreen extends React.Component {
                     <View style={{flex: 9}}></View>
                     <View style={styles.profile_information_wrapper}>
                         <View style={{flex: 23, borderWidth: 1, borderColor: '#dcdcdc', aspectRatio: 1, borderRadius: 1000}}>
-                            <Image style={{flex: 1, aspectRatio: 1, borderRadius: 1000}} source={require('../assets/images/taja_logo.png')} />
+                            <Image style={{flex: 1, aspectRatio: 1, borderRadius: 1000}} source={require('../assets/images/car.png')} />
                         </View>
-                        <View style={{flex: 8, justifyContent: 'flex-end',}}>
-                            <Text style={{fontSize: RFValue(20), fontWeight: '700'}}>AUTC</Text>
+                        <View style={{flex: 8, justifyContent: 'flex-end'}}>
+                            <Text style={{fontSize: RFValue(20), fontWeight: '700'}}>{this.props.route.params}</Text>
                         </View>
                     </View>
                     <View style={{flex: 22}}></View>
@@ -141,7 +143,7 @@ class ModalList extends React.Component {
                     <View style={{flex: 1}}></View>
                     <View style={{flex: 1, backgroundColor: 'white', borderRadius: 10}}>
                         <View style={styles.modal_contents_wrapper}>
-                            <Text style={{fontSize: RFValue(20)}}>이곳은 이메일 공간입니다.{'\n'} 다음을 기대해 주세요^^ㅗ 메롱</Text>
+                            <Text style={{fontSize: RFValue(20)}}>이곳은 이메일 공간입니다.{'\n'} </Text>
                         </View>
                         <View style={styles.modal_button_area}>
                             <Button title="취소" type="clear" onPress={()=>{this.props.toggleModal()}} />
@@ -154,7 +156,7 @@ class ModalList extends React.Component {
                     <View style={{flex: 1}}></View>
                     <View style={{flex: 1, backgroundColor: 'white', borderRadius: 10}}>
                         <View style={styles.modal_contents_wrapper}>
-                            <Text>이곳은 계좌번호 공간입니다. 다음을 기대해 주세요^^ㅗ 메롱</Text>
+                            <Text>이곳은 계좌번호 공간입니다. </Text>
                         </View>
                         <View style={styles.modal_button_area}>
                             <Button title="취소" type="clear" onPress={()=>{this.props.toggleModal()}} />
@@ -167,7 +169,7 @@ class ModalList extends React.Component {
                 <View style={{flex: 1}}></View>
                     <View style={{flex: 1, backgroundColor: 'white', borderRadius: 10}}>
                         <View style={styles.modal_contents_wrapper}>
-                            <Text>이곳은 친구목록 공간입니다. 다음을 기대해 주세요^^ㅗ 메롱</Text>
+                            <Text>이곳은 친구목록 공간입니다. </Text>
                         </View>
                         <View style={styles.modal_button_area}>
                             <Button title="취소" type="clear" onPress={()=>{this.props.toggleModal()}} />
@@ -180,7 +182,7 @@ class ModalList extends React.Component {
                     <View style={{flex: 1}}></View>
                     <View style={{flex: 1, backgroundColor: 'white', borderRadius: 10}}>
                         <View style={styles.modal_contents_wrapper}>
-                            <Text>이곳은 쪽지 공간입니다. 다음을 기대해 주세요^^ㅗ 메롱</Text>
+                            <Text>이곳은 쪽지 공간입니다. </Text>
                         </View>
                         <View style={styles.modal_button_area}>
                             <Button title="취소" type="clear" onPress={()=>{this.props.toggleModal()}} />
@@ -193,7 +195,7 @@ class ModalList extends React.Component {
                 <View style={{flex: 1}}></View>
                     <View style={{flex: 1, backgroundColor: 'white', borderRadius: 10}}>
                         <View style={styles.modal_contents_wrapper}>
-                            <Text>이곳은 동행횟수 공간입니다. 다음을 기대해 주세요^^ㅗ 메롱</Text>
+                            <Text>이곳은 동행횟수 공간입니다. </Text>
                         </View>
                         <View style={styles.modal_button_area}>
                             <Button title="취소" type="clear" onPress={()=>{this.props.toggleModal()}} />
@@ -206,7 +208,7 @@ class ModalList extends React.Component {
                 <View style={{flex: 1}}></View>
                     <View style={{flex: 1, backgroundColor: 'white', borderRadius: 10}}>
                         <View style={styles.modal_contents_wrapper}>
-                            <Text>이곳은 계정관리 공간입니다. 다음을 기대해 주세요^^ㅗ 메롱</Text>
+                            <Text>이곳은 계정관리 공간입니다. </Text>
                         </View>
                         <View style={styles.modal_button_area}>
                             <Button title="취소" type="clear" onPress={()=>{this.props.toggleModal()}} />
@@ -219,7 +221,19 @@ class ModalList extends React.Component {
         )
     }
 }
-
+const header = {
+    title: '프로필',
+    headerStyle: {
+        backgroundColor: 'white',
+        elevation: 0,
+        shadowOpacity: 0,
+        borderBottomWidth: 2,
+    },
+    headerTintColor: 'black',
+    headerTitleStyle: {
+        fontWeight: 'bold',
+    },
+}
 const styles = StyleSheet.create({
     container: {
         flex: 1,

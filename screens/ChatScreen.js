@@ -12,7 +12,6 @@ export default class ChatScreen extends React.Component {
     constructor(props){
         super(props)
         const self = this
-
         this.channelData = this.props.route.params
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.channelHandler = new this.sb.ChannelHandler()
@@ -96,6 +95,7 @@ export default class ChatScreen extends React.Component {
 
     componentDidMount() {
         const self = this
+        this.props.navigation.setOptions(header)
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
                 return;
@@ -420,8 +420,18 @@ class ChatContentByMe extends React.Component {
     }
 }
 
-ChatScreen.navigationOptions = {
-    header: null,
+const header = {
+    title: '채팅방',
+    headerStyle: {
+        backgroundColor: '#0d1f37',
+        elevation: 0,
+        shadowOpacity: 0,
+        borderBottomWidth: 1,
+    },
+    headerTintColor: 'white',
+    headerTitleStyle: {
+        fontWeight: 'bold',
+    },
 }
 
 const styles = StyleSheet.create({
