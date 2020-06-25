@@ -77,6 +77,7 @@ export default class HomeScreen extends React.Component {
             startTime : this.state.selectedTime,
             startLocation : this.state.selectedStartLocation,
             arriveLocation : this.state.selectedEndLocation,
+            isFrozen : false
         }
         const This = this
         this.sb.OpenChannel.createChannel("타이틀", "", JSON.stringify(data), [] ,'', (openChannel, error) => {
@@ -93,8 +94,9 @@ export default class HomeScreen extends React.Component {
         this.props.navigation.navigate('Chat', this.state.selectedChattingRoom)
     }
 
-    renderChattingRooms(chattingRoomList){
-        return chattingRoomList.map((channel,idx)=>{
+    renderChattingRooms(){
+        const self = this
+        return this.state.chattingRoomList.map((channel,idx)=>{
             const info = JSON.parse(channel.data)
             const channelData = {
                 userName : this.nickname,
@@ -102,8 +104,11 @@ export default class HomeScreen extends React.Component {
                 startTime : info.startTime,
                 startLocation : info.startLocation,
                 arriveLocation : info.arriveLocation,
+                isFrozen: info.isFrozen
             }
-            return <ChattingRoom key={idx} channelData={channelData} handlePressList={(channelData)=>this.handlePressList(channelData)} />
+            return (info.isFrozen) 
+                ? <ChattingRoom key={idx} channelData={channelData} handlePressList={(channelData)=>this.handlePressList(channelData)} />
+                : <View />
         })
     }
 
@@ -132,8 +137,9 @@ export default class HomeScreen extends React.Component {
     render(){
         return (
             <View style={styles.container}>
+
                 <ScrollView refreshControl={<RefreshControl refreshing={!this.state.isRefreshing} onRefresh={()=>this.handleRefresh()} />}>
-                    {this.renderChattingRooms(this.state.chattingRoomList)}
+                    {this.renderChattingRooms()}
                 </ScrollView>
                 <ModalEnterChat
                     ModalEnterChatVisible={this.state.ModalEnterChatVisible}
