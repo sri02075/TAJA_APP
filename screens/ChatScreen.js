@@ -1,10 +1,10 @@
-import * as React from 'react';
-import { Image, TextInput, BackHandler, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as React from 'react'
+import { Image, TextInput, BackHandler, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import {RFValue } from "react-native-responsive-fontsize"
-import Icon from 'react-native-vector-icons/FontAwesome';
-import { ScrollView } from 'react-native-gesture-handler';
-import Modal, { ReactNativeModal } from 'react-native-modal';
-import Select from 'react-native-picker-select';
+import Icon from 'react-native-vector-icons/FontAwesome'
+import { ScrollView } from 'react-native-gesture-handler'
+import Modal, { ReactNativeModal } from 'react-native-modal'
+import Select from 'react-native-picker-select'
 import { Input, Button } from 'react-native-elements'
 import SendBird from 'sendbird'
 
@@ -16,18 +16,17 @@ export default class ChatScreen extends React.Component {
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.channelHandler = new this.sb.ChannelHandler()
         
-
         this.sb.connect(this.channelData.userName, (user, error) => {})
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
-                return;
+                return
             }
             self.channel = openChannel
             openChannel.enter(function(response, error) {
                 if (error) {
-                    return;
+                    return
                 }
-                // self.sendCustomMessage(`${self.channelData.userName}님이 입장하셨습니다!!`)
+                self.setState({ memberNum: self.channel.participantCount })
             })
         })
 
@@ -48,6 +47,7 @@ export default class ChatScreen extends React.Component {
             self.chatRefresh()
         }
         this.channelHandler.onUserEntered = (channel, message) => {
+            self.setState({ memberNum: self.channel.participantCount })
             channel.getMetaData(["userList"],(response, error) => {
                 // console.log(response.userList)
                 if(response.userList==null){
@@ -129,7 +129,7 @@ export default class ChatScreen extends React.Component {
         this.props.navigation.setOptions(header)
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
-                return;
+                return
             }
         
             const lastMessage = openChannel.createPreviousMessageListQuery()
@@ -186,7 +186,7 @@ export default class ChatScreen extends React.Component {
         const self = this
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
-                return;
+                return
             }
         
             const lastMessage = openChannel.createPreviousMessageListQuery()
@@ -314,6 +314,7 @@ export default class ChatScreen extends React.Component {
     }
 
     render(){
+        console.log(this.state.memberNum)
         return (
             <View style={styles.container}>
                 <View style={styles.member_status_wrapper}>
