@@ -280,6 +280,7 @@ export default class ChatScreen extends React.Component {
                     stickyHeaderIndices={true}
                     syle={{transform: [{ scaleY: -1 }]}}
                     ref={ref => this.scrollview = ref}
+                    style={styles.chat_area}
                     onContentSizeChange={this.onContentSizeChangeHandler.bind(this)} 
                 >
                     <View>{this.renderChat()}</View>
@@ -291,6 +292,7 @@ export default class ChatScreen extends React.Component {
                     </TouchableOpacity>
                     <View style={styles.input_chat_wrapper}>
                         <Input
+                            containerStyle={styles.input_container}
                             inputContainerStyle={styles.inputContainer_input_chat}
                             inputStyle={styles.inputStyle_input_chat}
                             style={styles.input_chat}
@@ -466,7 +468,8 @@ const header = {
         backgroundColor: '#0d1f37',
         elevation: 0,
         shadowOpacity: 0,
-        borderBottomWidth: 1,
+        borderBottomWidth: 0,
+        // borderColor:
     },
     headerTintColor: 'white',
     headerTitleStyle: {
@@ -476,24 +479,32 @@ const header = {
 
 const styles = StyleSheet.create({
     input_wrapper: {
+        height: 50,
         flexDirection: 'row',
         backgroundColor: 'white',
     },
     input_plus_wrapper: {
-        flex: 15,
+        marginLeft: '4.629%',
+        marginRight: '3.703%',
+        width: '5.648%',
         alignItems: 'center',
         justifyContent: 'center',
-        height: 50
+        borderColor: 'black',
+        borderWidth: 1,
     },
     input_plus: {
-        width: '57.5%',
-        height: '57.5%', //57.5%
-        // borderColor: 'black',
-        // borderWidth: 1,
-        resizeMode: 'center'
+        width: '100%',
+        height: '100%',
+        resizeMode: 'contain'
     },
     input_chat_wrapper: {
-        flex: 80,
+        width: '72.962%',
+        borderWidth: 1,
+        borderColor: 'black',
+    },
+    input_container: {
+        width: '100%',
+        height: '100%',
         borderWidth: 1,
         borderColor: 'black',
     },
@@ -509,20 +520,21 @@ const styles = StyleSheet.create({
     },
     input_chat: {
         width: '100%',
-        color: 'yellow',
+        color: 'black',
     },
     input_send_wrapper: {
-        flex: 17,
+        marginHorizontal: '2.777%',
+        width: '7.314%',
         alignItems: 'center',
         justifyContent: 'center',
-        height: 50
+        height: 50,
+        borderColor: 'black',
+        borderWidth: 1,
     },
-    input_send: {
-        width: '57.5%',
-        height: '57.5%', //57.5%
-        // borderColor: 'black',
-        // borderWidth: 1,
-        resizeMode: 'center'
+    input_send: { // 밑30 위31 68 -> 129
+        width: '100%', // 30 30 139 153
+        height: '100%',
+        resizeMode: 'contain'
     },
 
     member_status_wrapper:{
@@ -608,6 +620,9 @@ const styles = StyleSheet.create({
         alignItems: 'stretch',
         paddingBottom: 10,
         marginHorizontal: '2%'
+    },
+    chat_area: {
+        paddingVertical : 30
     },
     icon_wrapper: {
         width: '20%',
