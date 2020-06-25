@@ -235,6 +235,8 @@ export default class ChatScreen extends React.Component {
                 ok={() => {
                     self.sb.OpenChannel.getChannel(this.channelData.url, (openChannel, error) => {
                         openChannel.updateMetaData({isFrozen: 'true'})
+                        self.setState({isModalVisible: false})
+                        self.sendCustomMessage("합승자 모집이 완료되었습니다.")
                     })
                 }}
                 text={"모집을 완료하시겠습니까?"} />,
@@ -252,10 +254,30 @@ export default class ChatScreen extends React.Component {
                 text={"미구현 기능입니다."} />
         ]
     }
+
+    renderMember(){
+        return <View/>
+    }
+
     render(){
         return (
             <View style={styles.container}>
+                <View style={styles.member_status_wrapper}>
+                    <View style={styles.member_icon_wrapper}>
+                        <Image style={styles.member_icon} source={require('../assets/images/member.png')}/>
+                    </View>
+                    <View style={styles.member_wrapper}>
+                        <Profile text={"최대8자까지된다"}/>
+                        <Profile text={"혼자타고싶어요"}/>
+                        <Profile text={"아저씨"}/>
+                        <Profile text={"꽃강아지"}/>
+                    </View>
+                    <View style={styles.spread_icon_wrapper}>
+                        <Image style={styles.spread_icon} source={require('../assets/images/spread.png')}/>
+                    </View>
+                </View>
                 <ScrollView
+                    stickyHeaderIndices={true}
                     syle={{transform: [{ scaleY: -1 }]}}
                     ref={ref => this.scrollview = ref}
                     onContentSizeChange={this.onContentSizeChangeHandler.bind(this)} 
@@ -281,6 +303,24 @@ export default class ChatScreen extends React.Component {
                     </TouchableOpacity>
                 </View>
                 {this.renderModal()}
+            </View>
+        )
+    }
+}
+
+class Profile extends React.Component {
+    constructor(props){
+        super(props)
+    }
+    render() {
+        return(
+            <View style={styles.profile_wrapper}>
+                <View style={styles.profile_icon_wrapper}>
+                    <Image style={styles.profile_icon} source={require('../assets/images/default_profile.png')}/>
+                </View>
+                <View style={styles.profile_text_wrapper}>
+                    <Text style={styles.profile_text}>{this.props.text}</Text>
+                </View>
             </View>
         )
     }
@@ -345,7 +385,7 @@ class PlusCollection extends React.Component {
             <View style={styles.btn_wrapper}>
                 <TouchableOpacity style={styles.btn_gallery_wrapper} onPress={()=>{this.props.funcArr[0]()}} >
                     <View style={styles.btn_gallery_icon_wrapper}>
-                        <Image style={styles.btn_gallery} source={require('../assets/images/plus.png')} />
+                        <Image style={styles.btn_gallery} source={require('../assets/images/gallary.png')} />
                     </View>
                     <View style={styles.btn_gallery_text_wrapper}>
                         <Text style={styles.btn_gallery_text}>갤러리</Text>
@@ -353,7 +393,7 @@ class PlusCollection extends React.Component {
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btn_dutch_wrapper} onPress={()=>{this.props.funcArr[1]()}} >
                     <View style={styles.btn_dutch_icon_wrapper}>
-                        <Image style={styles.btn_dutch} source={require('../assets/images/plus.png')} />
+                        <Image style={styles.btn_dutch} source={require('../assets/images/coin.png')} />
                     </View>
                     <View style={styles.btn_dutch_text_wrapper}>
                         <Text style={styles.btn_dutch_text}>더치페이</Text>
@@ -361,7 +401,7 @@ class PlusCollection extends React.Component {
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.btn_endInvite_wrapper} onPress={()=>{this.props.funcArr[2]()}} >
                     <View style={styles.btn_endInvite_icon_wrapper}>
-                        <Image styl4444444e={styles.btn_endInvite} source={require('../assets/images/plus.png')} />
+                        <Image styl4444444e={styles.btn_endInvite} source={require('../assets/images/stop.png')} />
                     </View>
                     <View style={styles.btn_endInvite_text_wrapper}>
                         <Text style={styles.btn_endInvite_text}>모집종료</Text>
@@ -381,7 +421,7 @@ class ChatContentByOther extends React.Component {
         return(
             <View style={styles.chatContent_area}>
                 <View style={styles.icon_wrapper}>
-                    <Image style={styles.image_icon} source={require('../assets/images/taja_logo.png')} />
+                    <Image style={styles.image_icon} source={require('../assets/images/default_profile.png')} />
                 </View>
                 <View style={styles.contents_wrapper}>
                     <View style={styles.nickname_wrapper}>
@@ -484,6 +524,80 @@ const styles = StyleSheet.create({
         // borderWidth: 1,
         resizeMode: 'center'
     },
+
+    member_status_wrapper:{
+        marginHorizontal: '3.703%',
+        backgroundColor: 'white',
+        height: 57,
+        borderRadius: 5,
+        flexDirection: 'row',
+    },
+    member_icon_wrapper:{
+        flex: 11,
+    },
+    member_icon:{
+        marginLeft: '18.75%',
+        marginRight: '6.25%',
+        marginVertical: '51.818%',
+        height: '28.125%',
+        width: '75%',
+        resizeMode: 'contain',
+        // borderColor: 'black',
+        // borderWidth: 1,
+    },
+    member_wrapper:{
+        flex: 80,
+        flexDirection: 'row'
+    },
+    spread_icon_wrapper:{
+        flex: 9,
+        // borderColor: 'black',
+        // borderWidth: 1,
+    },
+    spread_icon:{
+        marginLeft: '5.555%',
+        marginRight: '52.222%',
+        width: '42.222%',
+        marginVertical: '75.555%',
+        height: '15.625%',
+        resizeMode: 'contain',
+
+        // borderColor: 'black',
+        // borderWidth: 1,
+    },
+
+    profile_wrapper: {
+        flex: 1,
+        flexDirection: 'column',
+        // borderColor: 'black',
+        // borderWidth: 1,
+        alignItems: 'center',
+    },
+    profile_icon_wrapper: {
+        marginTop: '9.375%',
+        marginBottom: '6.25%',
+        width: '50%',
+        height: '62.5%',
+    },
+    profile_icon:{
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+        
+        borderColor: 'black',
+        borderWidth: 1,
+        borderRadius: 100,
+    },
+    profile_text_wrapper: {
+        marginBottom: '6.25%',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    profile_text: {
+        fontSize: 7,
+        color: '#999999'
+    },
+
     container: { 
         flex: 1,
         backgroundColor: '#0d1f37',
@@ -595,5 +709,5 @@ const styles = StyleSheet.create({
     btn_wrapper: {
         flexDirection: 'row',
         backgroundColor: 'white',
-    }
+    } // 87 15 68, 96.666 16.666 75.555
 });
