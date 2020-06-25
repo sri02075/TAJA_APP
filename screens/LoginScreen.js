@@ -10,7 +10,7 @@ export default class LoginScreen extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            email : '',
+            femail : '',
             password : '',
             spinner: false,
         }
@@ -38,12 +38,6 @@ export default class LoginScreen extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props.navigation,this.props.route)
-        /* const resetAction = StackActions.reset({
-        index: 0,
-        actions: [NavigationActions.navigate({ routeName: 'Login' })],
-        })
-        this.props.navigation.dispatch(resetAction) */
         this.props.navigation.setOptions(header)
     }
     async loginUser() {
@@ -106,7 +100,7 @@ export default class LoginScreen extends Component {
                 />
                 <View style={styles.title_area }>
                     <Text style={styles.text_title}>반갑습니다 :)</Text>
-                    <Text style={styles.text_title}>안양 택시</Text>
+                    <Text style={styles.text_title}>택시</Text>
                     <Text style={styles.text_title}>같이 탈래요?</Text>
                 </View>
                 <View style={styles.input_area}>
@@ -236,6 +230,7 @@ const header = {
         justifyContent : "flex-end",
     },
     input_container : {
+        flex:1,
         width : "100%",
     },
     input : {
