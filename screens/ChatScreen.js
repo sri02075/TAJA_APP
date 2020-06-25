@@ -26,7 +26,7 @@ export default class ChatScreen extends React.Component {
                 if (error) {
                     return
                 }
-                self.setState({ memberNum: self.channel.participantCount })
+                self.setState({ user_count: self.channel.participantCount })
             })
         })
 
@@ -40,14 +40,14 @@ export default class ChatScreen extends React.Component {
             isModalVisible: false,
             selectedModal: 0,
             payList : [],
-            user_count: 4,
+            user_count: 0,
         }
         
         this.channelHandler.onMessageReceived = (channel, message) => {
             self.chatRefresh()
         }
         this.channelHandler.onUserEntered = (channel, message) => {
-            self.setState({ memberNum: self.channel.participantCount })
+            self.setState({ user_count: self.channel.participantCount })
             channel.getMetaData(["userList"],(response, error) => {
                 console.log(response.userList)
                 if(response.userList==null){
@@ -64,7 +64,6 @@ export default class ChatScreen extends React.Component {
             })
         }
         this.channelHandler.onUserExited = function(channel, message) {
-            console.log(message)
             // self.setState({
             //     members: [...self.state.members, ]
             // })
@@ -225,6 +224,15 @@ export default class ChatScreen extends React.Component {
         }
         
     }
+    getDutchPayMessage(){
+        const {payList} = this.state
+        const result = payList.reduce((acc,cur,idx)=>{
+            const str = `${idx+1} 님 : ${cur}원\n`
+            return acc+str
+        },'')
+        console.log(result)
+        return result
+    }
 
     renderChat() {
         return this.state.chatHistory.map((chat,idx) =>{
@@ -283,6 +291,7 @@ export default class ChatScreen extends React.Component {
                 user_count={this.state.user_count}
                 changePayList = {(payList)=>this.setState({payList:payList})}
                 ok={() => {cancle()}}
+                sendDutchMessage={()=>{this.sendCustomMessage(this.getDutchPayMessage());cancle()}}
                 text={"더치페이"} />,
             <ModalConfirm
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==3)}
@@ -332,8 +341,7 @@ export default class ChatScreen extends React.Component {
                     syle={{transform: [{ scaleY: -1 }]}}
                     ref={ref => this.scrollview = ref}
                     style={styles.chat_area}
-                    onContentSizeChange={this.onContentSizeChangeHandler.bind(this)} 
-                >
+                    onContentSizeChange={this.onContentSizeChangeHandler.bind(this)} >
                     <View>{this.renderChat()}</View>
                 </ScrollView>
                 {this.renderPlus()}
@@ -399,9 +407,10 @@ class ModalConfirm extends React.Component {
                 return
             }
             const payList =this.calculatePay(this.state.totalPay,this.props.user_count)
-            console.log(JSON.stringify(payList))
             this.props.changePayList(payList)
             this.input_pay.current.clear()
+            this.props.sendDutchMessage()
+            return
         }
         this.props.ok()
     }
@@ -423,7 +432,12 @@ class ModalConfirm extends React.Component {
             <Modal isVisible={this.props.isVisible}>
                 <View style={styles.modal_enterChat_wrapper}>
                     <View style={{height: this.props.isType == 1 ? 150 : 230,backgroundColor:'white',padding : 25,borderRadius:10}}>
-                        <ModalConTents isType={this.props.isType} text={this.props.text} input_pay={this.input_pay} onChangeText={(value)=>this.setState({totalPay:value})}/>
+                        <ModalConTents 
+                            isType={this.props.isType}
+                            text={this.props.text}
+                            input_pay={this.input_pay}
+                            user_count={this.props.user_count}
+                            onChangeText={(value)=>this.setState({totalPay:value})}/>
                         <View style={styles.modal_last_area}>
                             <View style={styles.modal_button_area}>
                                 <Button titleStyle={{color:'black'}} type="clear" title="취소" onPress={()=>this.props.cancle()} />
@@ -459,14 +473,14 @@ class ModalConTents extends React.Component {
                             <View style={styles.modal_input_area}>
                                 <Input
                                     ref={this.props.input_pay}
-                                    containerStyle={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'yellow'}}
-                                    inputContainerStyle={{borderBottomWidth:0,alignItems:'center',justifyContent:'center'}}
-                                    inputStyle={{alignItems:'flex-end',justifyContent:'center',fontSize: RFValue(20),color:'gray'}}
+                                    containerStyle={{flex:1,justifyContent:'center',alignItems:'center'}}
+                                    inputContainerStyle={{borderBottomWidth:1,alignItems:'center',justifyContent:'center'}}
+                                    inputStyle={{paddingTop: '20%', alignItems:'flex-end',justifyContent:'center',fontSize: RFValue(20),color:'gray'}}
                                     onChangeText={(value)=>this.props.onChangeText(value)}/>
                                 <Text style={{fontSize:RFValue(20)}}>원</Text>
                             </View>
                             <View style={styles.modal_input_info_area}>
-                                <Text style={{fontSize:RFValue(20)}}>/ 4명</Text>
+                                <Text style={{fontSize:RFValue(20)}}>{`/ ${this.props.user_count}명`}</Text>
                             </View>
                         </View>
                     </View>
@@ -793,7 +807,6 @@ const styles = StyleSheet.create({
     },
     modal_content_wrapper: {
         flex:4,
-        backgroundColor: 'red'
     },
     modal_content_area: {
         flex:1,
@@ -801,9 +814,9 @@ const styles = StyleSheet.create({
     },
     modal_input_area: {
         flex:3,
-        backgroundColor: 'purple',
         flexDirection:'row',
-        alignItems: 'center'
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     modal_input_info_area: {
         flex:1,
@@ -814,7 +827,6 @@ const styles = StyleSheet.create({
     modal_input_wrapper: {
         flex: 5,
         flexDirection: 'row',
-        backgroundColor: 'green',
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -822,8 +834,7 @@ const styles = StyleSheet.create({
         flex:1,
         paddingRight: "10%",
         paddingLeft: "10%",
-        backgroundColor: 'blue',
-        borderBottomWidth: 1,
+        borderBottomWidth: 0,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
