@@ -225,6 +225,9 @@ export default class ChatScreen extends React.Component {
         }
         
     }
+    getDutchPayMessage(){
+        
+    }
 
     renderChat() {
         return this.state.chatHistory.map((chat,idx) =>{
@@ -282,7 +285,7 @@ export default class ChatScreen extends React.Component {
                 cancle={() => {cancle()}}
                 user_count={this.state.user_count}
                 changePayList = {(payList)=>this.setState({payList:payList})}
-                ok={() => {cancle()}}
+                ok={() => {sendCustomMessage();cancle()}}
                 text={"더치페이"} />,
             <ModalConfirm
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==3)}
