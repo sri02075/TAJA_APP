@@ -26,7 +26,7 @@ export default class ChatScreen extends React.Component {
                 if (error) {
                     return
                 }
-                self.setState({ memberNum: self.channel.participantCount })
+                self.setState({ user_count: self.channel.participantCount })
             })
         })
 
@@ -40,14 +40,14 @@ export default class ChatScreen extends React.Component {
             isModalVisible: false,
             selectedModal: 0,
             payList : [],
-            user_count: 4,
+            user_count: 0,
         }
         
         this.channelHandler.onMessageReceived = (channel, message) => {
             self.chatRefresh()
         }
         this.channelHandler.onUserEntered = (channel, message) => {
-            self.setState({ memberNum: self.channel.participantCount })
+            self.setState({ user_count: self.channel.participantCount })
             channel.getMetaData(["userList"],(response, error) => {
                 // console.log(response.userList)
                 if(response.userList==null){
@@ -64,7 +64,6 @@ export default class ChatScreen extends React.Component {
             })
         }
         this.channelHandler.onUserExited = function(channel, message) {
-            console.log(message)
             // self.setState({
             //     members: [...self.state.members, ]
             // })
@@ -226,7 +225,13 @@ export default class ChatScreen extends React.Component {
         
     }
     getDutchPayMessage(){
-        
+        const {payList} = this.state
+        const result = payList.reduce((acc,cur,idx)=>{
+            const str = `${idx+1} 님 : ${cur}원\n`
+            return acc+str
+        },'')
+        console.log(result)
+        return result
     }
 
     renderChat() {
@@ -285,7 +290,8 @@ export default class ChatScreen extends React.Component {
                 cancle={() => {cancle()}}
                 user_count={this.state.user_count}
                 changePayList = {(payList)=>this.setState({payList:payList})}
-                ok={() => {sendCustomMessage();cancle()}}
+                ok={() => {cancle()}}
+                sendDutchMessage={()=>{this.sendCustomMessage(this.getDutchPayMessage());cancle()}}
                 text={"더치페이"} />,
             <ModalConfirm
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==3)}
@@ -314,7 +320,6 @@ export default class ChatScreen extends React.Component {
     }
 
     render(){
-        console.log(this.state.memberNum)
         return (
             <View style={styles.container}>
                 <View style={styles.member_status_wrapper}>
@@ -403,9 +408,10 @@ class ModalConfirm extends React.Component {
                 return
             }
             const payList =this.calculatePay(this.state.totalPay,this.props.user_count)
-            console.log(JSON.stringify(payList))
             this.props.changePayList(payList)
             this.input_pay.current.clear()
+            this.props.sendDutchMessage()
+            return
         }
         this.props.ok()
     }
