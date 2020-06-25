@@ -26,7 +26,7 @@ export default class ChatScreen extends React.Component {
                 if (error) {
                     return
                 }
-                self.setState=({ memberNum: sel })
+                self.setState({ memberNum: self.channel.participantCount })
             })
         })
 
@@ -47,6 +47,7 @@ export default class ChatScreen extends React.Component {
             self.chatRefresh()
         }
         this.channelHandler.onUserEntered = (channel, message) => {
+            self.setState({ memberNum: self.channel.participantCount })
             channel.getMetaData(["userList"],(response, error) => {
                 // console.log(response.userList)
                 if(response.userList==null){
@@ -310,6 +311,7 @@ export default class ChatScreen extends React.Component {
     }
 
     render(){
+        console.log(this.state.memberNum)
         return (
             <View style={styles.container}>
                 <View style={styles.member_status_wrapper}>
