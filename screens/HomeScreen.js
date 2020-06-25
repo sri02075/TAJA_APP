@@ -162,8 +162,10 @@ export default class HomeScreen extends React.Component {
             openChannels.reduce( async (acc,cur)=>{
                 const response = await acc
                 if(response){
-                    self.setState({
-                        chattingRooms: [...self.state.chattingRooms,response]
+                    self.setState(state=>{
+                        state.chattingRooms.push(response)
+                        return state
+                        //chattingRooms: [...self.state.chattingRooms,response]
                     })
                 }
                 return cur.getAllMetaData()
