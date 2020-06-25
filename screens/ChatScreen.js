@@ -95,6 +95,15 @@ export default class ChatScreen extends React.Component {
 
     componentDidMount() {
         const self = this
+        header.headerLeft = ()=>(
+            <TouchableOpacity style={{width:25,marginLeft:19}} onPress={()=>self.toggleModal(0)}>
+                <Icon
+                    name="arrow-left"
+                    size={25}
+                    color="white"
+                />
+            </TouchableOpacity>
+        )
         this.props.navigation.setOptions(header)
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {

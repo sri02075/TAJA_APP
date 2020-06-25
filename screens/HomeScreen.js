@@ -43,9 +43,19 @@ export default class HomeScreen extends React.Component {
 
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.sb.connect(this.nickname, (user, error) => {})
-        this.props.navigation.setOptions(header)
     }
     componentDidMount() {
+        const self = this
+        header.headerRight = ()=>(
+            <TouchableOpacity style={{width:50}} onPress={()=>self.handleRefresh()}>
+                <Icon
+                    name="refresh"
+                    size={30}
+                    color="black"
+                />
+            </TouchableOpacity>
+        )
+        this.props.navigation.setOptions(header)
         this.handleRefresh()
     }
     selectStartLocation(location) {
@@ -492,10 +502,6 @@ const header = {
         fontWeight: 'bold',
     },
 }
-HomeScreen.navigationOptions = {
-    header: header,
-};
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
