@@ -49,14 +49,14 @@ export default class ChatScreen extends React.Component {
         this.channelHandler.onUserEntered = (channel, message) => {
             self.setState({ memberNum: self.channel.participantCount })
             channel.getMetaData(["userList"],(response, error) => {
-                // console.log(response.userList)
+                console.log(response.userList)
                 if(response.userList==null){
                     self.channel.createMetaData({userList: JSON.stringify({userList: [self.channelData.userName]})})
                     self.setState({ userList: [self.channelData.userName] })
                 } else {
                     const userList = JSON.parse(response.userList).userList
                     if(!userList.includes(self.channelData.userName)){
-                        // console.log(`${response.userList}_${self.channelData.userName}`)
+                        console.log(`${response.userList}_${self.channelData.userName}`)
                         
                         self.channel.updateMetaData({userList: JSON.stringify({userList: [...userList, self.channelData.userName]})})
                     }
@@ -311,7 +311,6 @@ export default class ChatScreen extends React.Component {
     }
 
     render(){
-        console.log(this.state.memberNum)
         return (
             <View style={styles.container}>
                 <View style={styles.member_status_wrapper}>

@@ -41,6 +41,7 @@ export default class SignupScreen extends Component {
             alert('정보를 입력해주세요')
             return
         }
+        console.log(checked)
         if(!checked){
             alert('개인정보 이용동의를 체크해주세요')
             return
