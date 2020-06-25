@@ -44,12 +44,9 @@ export default class LoginScreen extends Component {
         const inputData = this.state
         this.setState({spinner:!this.state.spinner})
         if(inputData.email !== '' && inputData.password !== ''){
-            console.log('access1')
             const response = await this.loginCheck()
             const {result,success} = response.data
             if(success){
-                //alert(result.token)
-                console.log('access2')
                 await deviceStorage.saveItem('JWT', result.token)
                 const token = await deviceStorage.getItem('JWT')
                 const response = await axios.get(
