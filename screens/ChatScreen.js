@@ -39,6 +39,8 @@ export default class ChatScreen extends React.Component {
             isFrozen: false,
             isModalVisible: false,
             selectedModal: 0,
+            payList : [],
+            user_count: 4,
         }
 
         this.channelHandler.onMessageReceived = function(channel, message) {
@@ -61,7 +63,6 @@ export default class ChatScreen extends React.Component {
     getParticipants() {
         this.sb.OpenChannel.getChannel(this.channelData.url, (openChannel, error) => {
             openChannel.getMetaData("participantsList", (response, error) => {
-                sd
             })
         })
     }
@@ -248,13 +249,15 @@ export default class ChatScreen extends React.Component {
                         self.sendCustomMessage("합승자 모집이 완료되었습니다.")
                     })
                 }}
-                text={"모집을 완료하시겠습니까?"} />,
+                text={"모집을 종료하시겠습니까?"} />,
             <ModalConfirm
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==2)}
                 isType={2}
                 cancle={() => {cancle()}}
-                ok={() => {}}
-                text={"더치페이 금액을 입력해주세요."} />,
+                user_count={this.state.user_count}
+                changePayList = {(payList)=>this.setState({payList:payList})}
+                ok={() => {cancle()}}
+                text={"더치페이"} />,
             <ModalConfirm
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==3)}
                 isType={1}
@@ -266,6 +269,19 @@ export default class ChatScreen extends React.Component {
 
     renderMember(){
         return <View/>
+    }
+    calculatePay(pay,user_count){
+        const result = []
+        for(let i=0; i<user_count; i++){
+            result.push(Math.floor(pay/user_count))
+        }
+        const sum = result.reduce((acc,cur)=>acc+cur)
+            if(pay !== sum){
+            for(let j=0; j<pay-sum; j++){
+                result[j] += 1
+            }
+        }
+        return result
     }
 
     render(){
@@ -289,7 +305,7 @@ export default class ChatScreen extends React.Component {
                     stickyHeaderIndices={true}
                     syle={{transform: [{ scaleY: -1 }]}}
                     ref={ref => this.scrollview = ref}
-                    onContentSizeChange={this.onContentSizeChangeHandler.bind(this)} 
+                    onContentSizeChange={this.onContentSizeChangeHandler.bind(this)}
                 >
                     <View>{this.renderChat()}</View>
                 </ScrollView>
@@ -338,19 +354,54 @@ class Profile extends React.Component {
 class ModalConfirm extends React.Component {
     constructor(props){
         super(props)
+        this.state= {
+            totalPay : undefined,
+        }
+        this.input_pay = React.createRef();
     }
-
+    
+    handleConfirm(){
+        if(this.props.isType == 2 ){
+            if(!this.state.totalPay){
+                alert('금액을 입력해주세요')
+                return
+            }
+            if(isNaN(this.state.totalPay*1)){
+                alert('숫자를 입력해주세요')
+                this.input_pay.current.clear()
+                return
+            }
+            const payList =this.calculatePay(this.state.totalPay,this.props.user_count)
+            console.log(JSON.stringify(payList))
+            this.props.changePayList(payList)
+            this.input_pay.current.clear()
+        }
+        this.props.ok()
+    }
+    calculatePay(pay,user_count){
+        const result = []
+        for(let i=0; i<user_count; i++){
+            result.push(Math.floor(pay/user_count))
+        }
+        const sum = result.reduce((acc,cur)=>acc+cur)
+            if(pay !== sum){
+            for(let j=0; j<pay-sum; j++){
+                result[j] += 1
+            }
+        }
+        return result
+    }
     render(){
         return(
             <Modal isVisible={this.props.isVisible}>
                 <View style={styles.modal_enterChat_wrapper}>
-                    <View style={{height:230,backgroundColor:'white',padding : 25,borderRadius:10}}>
-                        <ModalConTents isType={this.props.isType} text={this.props.text}/>
+                    <View style={{height: this.props.isType == 1 ? 150 : 230,backgroundColor:'white',padding : 25,borderRadius:10}}>
+                        <ModalConTents isType={this.props.isType} text={this.props.text} input_pay={this.input_pay} onChangeText={(value)=>this.setState({totalPay:value})}/>
                         <View style={styles.modal_last_area}>
                             <View style={styles.modal_button_area}>
                                 <Button titleStyle={{color:'black'}} type="clear" title="취소" onPress={()=>this.props.cancle()} />
                                 <View style={{width:16}}></View>
-                                <Button titleStyle={{color:'black'}} type="clear" title="확인" onPress={()=>this.props.ok()} />
+                                <Button titleStyle={{color:'black'}} type="clear" title="확인" onPress={()=>this.handleConfirm()} />
                             </View>
                         </View>
                     </View>
@@ -362,6 +413,8 @@ class ModalConfirm extends React.Component {
 
 class ModalConTents extends React.Component {
     render() {
+        
+
         if(this.props.isType==1){
             return(
                 <View style={styles.modal_content_area}>
@@ -375,11 +428,19 @@ class ModalConTents extends React.Component {
                         <Text style={styles.text_modal_title}>{this.props.text}</Text>
                     </View>
                     <View style={styles.modal_input_wrapper}>
-                        <View style={styles.modal_input_area}>
-                            <Input style={styles.input_modal} />
-                        </View>
-                        <View style={styles.modal_input_info_area}>
-                            <Text>3/4</Text>
+                        <View style={styles.modal_input_wrapper_wrapper}>
+                            <View style={styles.modal_input_area}>
+                                <Input
+                                    ref={this.props.input_pay}
+                                    containerStyle={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'yellow'}}
+                                    inputContainerStyle={{borderBottomWidth:0,alignItems:'center',justifyContent:'center'}}
+                                    inputStyle={{alignItems:'flex-end',justifyContent:'center',fontSize: RFValue(20),color:'gray'}}
+                                    onChangeText={(value)=>this.props.onChangeText(value)}/>
+                                <Text style={{fontSize:RFValue(20)}}>원</Text>
+                            </View>
+                            <View style={styles.modal_input_info_area}>
+                                <Text style={{fontSize:RFValue(20)}}>/ 4명</Text>
+                            </View>
                         </View>
                     </View>
                 </View>
@@ -592,7 +653,6 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         overflow: 'hidden',
-        
         borderColor: 'black',
         borderWidth: 1,
         borderRadius: 100,
@@ -606,8 +666,7 @@ const styles = StyleSheet.create({
         fontSize: 7,
         color: '#999999'
     },
-
-    container: { 
+    container: {
         flex: 1,
         backgroundColor: '#0d1f37',
     },
@@ -660,7 +719,10 @@ const styles = StyleSheet.create({
     text_time: {
         color: '#6E7887'
     },
-
+    text_modal_content: {
+        fontSize: RFValue(16),
+        color: "#787878", 
+    },
     chatContent_area_me: {
         overflow : "visible",
         flexDirection: 'row',
@@ -702,7 +764,7 @@ const styles = StyleSheet.create({
         /* backgroundColor:"yellow", */
     },
     modal_last_area: {
-        flex:4,
+        height: 30
         /* backgroundColor:"blue", */
     },
     modal_button_area: {
@@ -714,7 +776,43 @@ const styles = StyleSheet.create({
     modal_timePicker_wrapper: {
         flex:6,
     },
-
+    modal_content_wrapper: {
+        flex:4,
+        backgroundColor: 'red'
+    },
+    modal_content_area: {
+        flex:1,
+        justifyContent:'center',
+    },
+    modal_input_area: {
+        flex:3,
+        backgroundColor: 'purple',
+        flexDirection:'row',
+        alignItems: 'center'
+    },
+    modal_input_info_area: {
+        flex:1,
+    },
+    text_modal_title: {
+        fontSize: RFValue(20)
+    },
+    modal_input_wrapper: {
+        flex: 5,
+        flexDirection: 'row',
+        backgroundColor: 'green',
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    modal_input_wrapper_wrapper: {
+        flex:1,
+        paddingRight: "10%",
+        paddingLeft: "10%",
+        backgroundColor: 'blue',
+        borderBottomWidth: 1,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
     btn_wrapper: {
         flexDirection: 'row',
         backgroundColor: 'white',
