@@ -164,8 +164,8 @@ export default class HomeScreen extends React.Component {
                                     selectStartLocation={(value)=>this.selectStartLocation(value)}
                                     selectEndLocation={(value)=>this.selectEndLocation(value)}
                                     selectHour={(value)=>this.selectHour(value)}
-                                    selectedMinutes={(value)=>this.selectedMinutes(value)}
-                                    selectedMeridiem={(value)=>this.selectedMeridiem(value)}
+                                    selectMinutes={(value)=>this.selectMinutes(value)}
+                                    selectMeridiem={(value)=>this.selectMeridiem(value)}
                                     createChattingRoom={()=>this.createChattingRoom()}/>
                             </TouchableOpacity>
                         </View>
@@ -202,20 +202,20 @@ function ModalCreateChat(props){
         <Modal isVisible={props.ModalCreateChatVisible}>
             <View style={styles.modal_wrapper}>
                 <View style={{flex:1}}></View>
-                <View style={{flex:2,backgroundColor:'white',padding : 25,borderRadius:10}}>
-                    <View style={styles.modal_title_area}>
+                <View style={{flex:1,backgroundColor:'white',padding : 25,borderRadius:10}}>
+                    <View style={styles.modal_title_create_area}>
                         <Text style={styles.text_modal_title}>새로운 동행</Text>
                     </View>
                     <View style={styles.modal_location_area}>
-                        <View style={styles.modal_startLocation_wrapper}>
-                            <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
+                        <View style={styles.modal_startLocation_create_wrapper}>
+                            <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
                                 <Text style={{fontSize:RFValue(16)}}>출발</Text>
                             </View>
                             <View style={styles.select_wrapper}>
                                 <Select
                                     onValueChange={(value) => props.selectStartLocation(value)}
                                     placeholder={{ label: '출발장소',value :null,color: '#CCCCCC'}}
-                                    style={{flex:1}}
+                                    //style={}
                                     items={[
                                         { label: '안양역', value: '안양역' },
                                         { label: '안양대 정문', value: '안양대 정문' },
@@ -342,7 +342,30 @@ class ChattingRoom extends React.Component {
         this.sb.connect('익명이', (user, error) => {})
     }
     getRemainingTime(departureTime){
-        
+        if(typeof(departureTime) === 'string') return '모집 종료'
+        let difference = departureTime - new Date().getTime()
+        let hour = 0
+        let minute = 0
+        if(difference <= 0) {
+            return `모집 종료`
+        }
+        while (difference >= 3600000) {
+            hour++
+            difference -= 3600000
+        }
+        while (difference >= 60000) {
+            minute++
+            difference -= 60000
+        }
+        if (hour <= 0) {
+            if (minute <= 0) {
+            return `곧 출발`
+            } else {
+            return `${minute + 1}분 전`
+            }
+        } else {
+            return `${hour}시간 ${minute + 1}분 전`
+        }
     }
 
     parseTime(timestamp){
@@ -388,7 +411,7 @@ class ChattingRoom extends React.Component {
                     </View>
                     <View style={styles.time_area}>
                         <View style={styles.time_wrapper}>
-                            <Text style={{color:'red'}}>5분전</Text>
+                            <Text style={{color:'red'}}> {this.getRemainingTime(this.props.channelData.startTime)}</Text>
                             <Text style={{color:'gray'}}>{this.parseTime(this.props.channelData.startTime)}</Text>
                         </View>
                     </View>
@@ -432,13 +455,19 @@ const styles = StyleSheet.create({
         marginTop: 30,
         justifyContent: 'flex-start',
     },
+    modal_title_create_area: {
+        flex:2,
+        /* backgroundColor:"green", */
+        justifyContent: 'flex-start',
+    },
     modal_location_area: {
         flex:5,
         /* backgroundColor:"yellow", */
     },
     modal_time_area: {
         flex:5,
-        marginTop: 10
+        marginTop: 10,
+        backgroundColor:'red'
     },
     modal_description_area: {
         flex:5,
@@ -494,13 +523,17 @@ const styles = StyleSheet.create({
         paddingTop: 25
     },
     modal_startLocation_wrapper: {
-        flex:1,
         flexDirection: 'row',
-        marginBottom: 5,
+        height : RFValue(28),
+    },
+    modal_startLocation_create_wrapper: {
+        flexDirection: 'row',
+        height : RFValue(28),
+        marginBottom: RFValue(8)
     },
     modal_EndLocation_wrapper: {
-        flex:1,
         flexDirection: 'row',
+        height : RFValue(28),
     },
     modal_Time_wrapper: {
         flex:1,
@@ -508,7 +541,7 @@ const styles = StyleSheet.create({
     },
     modal_text_wrapper: {
         flex:3,
-        justifyContent:'center'
+        justifyContent:'center',
     },
     description: {
         flex : 2,
@@ -583,10 +616,12 @@ const styles = StyleSheet.create({
     select_wrapper: {
         flex:3,
         borderWidth: 1,
-        marginTop:8,
         justifyContent:'center',
+        alignItems: 'center',
         borderRadius:4,
-        borderColor:'#dcdcdc'
+        borderColor:'#dcdcdc',
+        height : RFValue(28),
+        paddingLeft: RFValue(12)
     },
     icon_wrapper: {
         flex: 5,
