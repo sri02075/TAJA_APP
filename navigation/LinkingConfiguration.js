@@ -18,5 +18,11 @@ export default {
     Chat : {
       path : 'home/chat',
     },
+    Home : {
+      path : 'home'
+    },
+    Profile: {
+      path: 'home/profile',
+    }
   },
 };

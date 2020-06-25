@@ -3,24 +3,20 @@ import { createStackNavigator } from '@react-navigation/stack';
 import React,{useState}  from 'react';
 import { Platform, StatusBar, StyleSheet, View ,Keyboard } from 'react-native';
 import useCachedResources from './hooks/useCachedResources';
-import MainTabNavigator from './navigation/MainTabNavigator';
 import LinkingConfiguration from './navigation/LinkingConfiguration';
 import SignUpScreen from './screens/SignUpScreen';
 import LoginScreen from './screens/LoginScreen';
 import HomeScreen from './screens/HomeScreen';
 import ResetpwScreen from './screens/ResetpwScreen';
-import ChatScreen from './screens/ChatScreen'
+import ChatScreen from './screens/ChatScreen';
+import ProfileScreen from './screens/ProfileScreen';
 import deviceStorage from './deviceStorage.js';
 
 const Stack = createStackNavigator();
 
 export default function App(props) {
-    const [token,setToken] = useState('test');
     const isLoadingComplete = useCachedResources();
 
-    const updateToken = (token)=>{
-        setToken(token)
-    }
     if (!isLoadingComplete) {
         return null;
     } else {
@@ -36,6 +32,7 @@ export default function App(props) {
                 <Stack.Screen name="ResetPw" component={ResetpwScreen} />
                 <Stack.Screen name="Home" component={HomeScreen} />
                 <Stack.Screen name="Chat" component={ChatScreen} />
+                <Stack.Screen name="Profile" component={ProfileScreen} />
             </Stack.Navigator>
             </NavigationContainer>
         </View>
