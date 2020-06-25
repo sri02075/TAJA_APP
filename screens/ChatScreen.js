@@ -15,13 +15,14 @@ export default class ChatScreen extends React.Component {
         this.channelData = this.props.route.params
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.channelHandler = new this.sb.ChannelHandler()
+        
 
         this.sb.connect(this.channelData.userName, (user, error) => {})
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
                 return;
             }
-
+            self.channel = openChannel
             openChannel.enter(function(response, error) {
                 if (error) {
                     return;
@@ -32,7 +33,7 @@ export default class ChatScreen extends React.Component {
 
         this.state = {
             chatHistory : [],
-            participants : [],
+            members : [],
             inputChat : '',
             defaultIcon : '../assets/images/taja_logo.png',
             isPlus: false,
@@ -40,12 +41,32 @@ export default class ChatScreen extends React.Component {
             isModalVisible: false,
             selectedModal: 0,
         }
-
-        this.channelHandler.onMessageReceived = function(channel, message) {
+        
+        this.channelHandler.onMessageReceived = (channel, message) => {
             self.chatRefresh()
         }
-        this.channelHandler.onUserEntered = function(channel, message) {
-            // self.chatRefresh()
+        this.channelHandler.onUserEntered = (channel, message) => {
+            channel.getMetaData(["userList"],(response, error) => {
+                // console.log(response.userList)
+                if(response.userList==null){
+                    self.channel.createMetaData({userList: JSON.stringify({userList: [self.channelData.userName]})})
+                    self.setState({ userList: [self.channelData.userName] })
+                } else {
+                    const userList = JSON.parse(response.userList).userList
+                    if(!userList.includes(self.channelData.userName)){
+                        // console.log(`${response.userList}_${self.channelData.userName}`)
+                        
+                        self.channel.updateMetaData({userList: JSON.stringify({userList: [...userList, self.channelData.userName]})})
+                    }
+                }  
+            })
+        }
+        this.channelHandler.onUserExited = function(channel, message) {
+            console.log(message)
+            // self.setState({
+            //     members: [...self.state.members, ]
+            // })
+            channel.participantCount
         }
         this.sb.addChannelHandler("UNIQUE_KEY", this.channelHandler)
         BackHandler.addEventListener('hardwareBackPress', () => {
@@ -235,7 +256,12 @@ export default class ChatScreen extends React.Component {
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==0)}
                 isType={1}
                 cancle={() => {cancle()}}
-                ok={() => {self.props.navigation.goBack()}}
+                ok={() => {
+                    self.channel.exit((response, error)=>{
+                        // alert(`${self.channelData.userName}님이 나갔습니다.`) // 나감 알림
+                    })
+                    self.props.navigation.goBack()
+                }}
                 text={"채팅을 끝내시겠습니까?"} />,
             <ModalConfirm
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==1)}
@@ -253,7 +279,22 @@ export default class ChatScreen extends React.Component {
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==2)}
                 isType={2}
                 cancle={() => {cancle()}}
-                ok={() => {}}
+                ok={() => {
+                    const pay = self.state.pay
+                    const user_count =self.state.user_count
+                    
+                    const result = []
+                    for(let i=0; i<user_count; i++){
+                        result.push(Math.floor(pay/user_count))
+                    }
+                    const sum = result.reduce((acc,cur)=>acc+cur)
+                    if(pay !== sum){
+                            for(let j=0; j<pay-sum; j++){
+                            result[j] += 1
+                        }
+                    }
+                    return [...result]
+                }}
                 text={"더치페이 금액을 입력해주세요."} />,
             <ModalConfirm
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==3)}
