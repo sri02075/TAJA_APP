@@ -1,13 +1,11 @@
 import * as React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View,ScrollView ,RefreshControl} from 'react-native';
 import { RFValue } from "react-native-responsive-fontsize"
 import { Button } from 'react-native-elements'
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { ScrollView } from 'react-native-gesture-handler';
 import Modal from 'react-native-modal';
 import Select from 'react-native-picker-select';
 import { CommonActions } from '@react-navigation/native';
-import TimePicker from 'react-native-simple-time-picker';
 import SendBird from 'sendbird'
 
 export default class HomeScreen extends React.Component {
@@ -20,9 +18,13 @@ export default class HomeScreen extends React.Component {
             appearKeyboard  : false,
             selectedStartLocation : '',
             selectedEndLocation : '',
-            selectedTime : '09:00 AM',
+            selectedHours: 8,
+            selectedMinutes: 30,
+            selectedMeridiem : 'AM',
+            selectedTime : 1593189000000,
             selectedChattingRoom : {},
             chattingRoomList : [],
+            isRefreshing: true,
         }
 
         const {token,nickname} = this.props.route.params
@@ -51,7 +53,18 @@ export default class HomeScreen extends React.Component {
     selectEndLocation(location) {
         this.setState({selectedEndLocation:location})
     }
-
+    selectHour(selectedHour) {
+        this.setState({selectedHour})
+    }
+    selectMinutes(selectedMinutes) {
+        this.setState({selectedMinutes})
+    }
+    selectMeridiem(selectedMeridiem) {
+        this.setState({selectedMeridiem})
+    }
+    handleOnChangeTime(date) {
+        this.setState({selectedTime:date})
+    }
     handlePressList(channelData){
         this.setState({
             ModalEnterChatVisible : !this.state.ModalEnterChatVisible,
@@ -61,7 +74,7 @@ export default class HomeScreen extends React.Component {
     createChattingRoom() {
         const data = {
             adminName : this.nickname,
-            startTime : '09:00 AM',
+            startTime : this.state.selectedTime,
             startLocation : this.state.selectedStartLocation,
             arriveLocation : this.state.selectedEndLocation,
             isFrozen : false
@@ -100,6 +113,7 @@ export default class HomeScreen extends React.Component {
     }
 
     handleRefresh(){
+        this.setState({isRefreshing: !this.state.isRefreshing})
         let openChannelListQuery = this.sb.OpenChannel.createOpenChannelListQuery();
         const This = this
         openChannelListQuery.next(function(openChannels, error) {
@@ -107,7 +121,8 @@ export default class HomeScreen extends React.Component {
                 return;
             }
             This.setState({
-                chattingRoomList : openChannels
+                chattingRoomList : openChannels,
+                isRefreshing: !This.state.isRefreshing,
             })
         })
     }
@@ -122,27 +137,17 @@ export default class HomeScreen extends React.Component {
     render(){
         return (
             <View style={styles.container}>
-                <ScrollView onRefresh={()=>alert('hello')}>
+
+                <ScrollView refreshControl={<RefreshControl refreshing={!this.state.isRefreshing} onRefresh={()=>this.handleRefresh()} />}>
                     {this.renderChattingRooms()}
                 </ScrollView>
-                <Button
-                    icon={
-                        <Icon
-                            name="arrow-right"
-                            size={15}
-                            color="white"
-                        />
-                        }
-                    buttonStyle={styles.button}
-                    containerStyle={styles.button_container}
-                    title=""
-                    titleStyle = {{color : 'black',fontWeight : 'bold'}}
-                    onPress={() => this.handleRefresh()}
-                />
                 <ModalEnterChat
                     ModalEnterChatVisible={this.state.ModalEnterChatVisible}
                     toggleModalEnterChat={()=>this.toggleModalEnterChat()}
-                    enterChattingRoom={()=>this.enterChattingRoom()}/>
+                    enterChattingRoom={()=>this.enterChattingRoom()}
+                    selectedChattingRoom={this.state.selectedChattingRoom}
+                    selectedHours={this.state.selectedHours}
+                    selectedMinutes={this.state.selectedMinutes}/>
                 <View style={styles.bottom_area}>
                         <View style={styles.logo_wrapper}>
                             <Image
@@ -160,14 +165,18 @@ export default class HomeScreen extends React.Component {
                                 />
                                 <ModalCreateChat
                                     ModalCreateChatVisible={this.state.ModalCreateChatVisible}
-                                    selectStartLocation={(location)=>this.selectStartLocation(location)}
-                                    selectEndLocation={(location)=>this.selectEndLocation(location)}
                                     toggleModalCreateChat={()=>this.toggleModalCreateChat()}
+                                    onChange={(hour,minutes)=>this.handleOnChangeTime(hour,minutes)}
+                                    selectStartLocation={(value)=>this.selectStartLocation(value)}
+                                    selectEndLocation={(value)=>this.selectEndLocation(value)}
+                                    selectHour={(value)=>this.selectHour(value)}
+                                    selectedMinutes={(value)=>this.selectedMinutes(value)}
+                                    selectedMeridiem={(value)=>this.selectedMeridiem(value)}
                                     createChattingRoom={()=>this.createChattingRoom()}/>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.profile_wrapper}>
-                            <TouchableOpacity style={styles.bottom_icon_wrapper} onPress={() => {}}>
+                            <TouchableOpacity style={styles.bottom_icon_wrapper} onPress={() => this.props.navigation.navigate('Profile')}>
                                 <Icon
                                     name="user-o"
                                     size={28}
@@ -181,10 +190,25 @@ export default class HomeScreen extends React.Component {
     }
 }
 function ModalCreateChat(props){
+    const hourItem = ()=>{
+        const hourItemArray = []
+        for(let i=1; i<=12; i++){
+            hourItemArray.push({label: `${i<10 ? '0'+i : i}`, value: i})
+        }
+        return hourItemArray
+    }
+    const minutesItem = ()=>{
+        const hourItemArray = []
+        for(let i=0; i<=55; i+=5){
+            hourItemArray.push({label: `${i<10 ? '0'+i : i}`, value: i})
+        }
+        return hourItemArray
+    }
     return (
         <Modal isVisible={props.ModalCreateChatVisible}>
             <View style={styles.modal_wrapper}>
-                <View style={{height:400,backgroundColor:'white',padding : 25,borderRadius:10}}>
+                <View style={{flex:1}}></View>
+                <View style={{flex:2,backgroundColor:'white',padding : 25,borderRadius:10}}>
                     <View style={styles.modal_title_area}>
                         <Text style={styles.text_modal_title}>새로운 동행</Text>
                     </View>
@@ -214,7 +238,7 @@ function ModalCreateChat(props){
                                 <Select
                                     onValueChange={(value) => props.selectEndLocation(value)}
                                     placeholder={{ label: '도착장소',value :null,color: '#CCCCCC'}}
-                                    style={{flex:1}}
+                                    style={{flex:1,paddingLeft:15}}
                                     items={[
                                         { label: '안양대 정문', value: '안양대 정문' },
                                         { label: '안양대 후문', value: '안양대 후문' },
@@ -226,15 +250,45 @@ function ModalCreateChat(props){
                     </View>
                     <View style={styles.modal_time_area}>
                         <View style={styles.modal_timePicker_wrapper}>
-                        {/* <TimePicker /> */}
+                            <View style={{flex:2,backgroundColor:'red',justifyContent: 'center',alignItems:'center'}}><Text style={{fontSize:RFValue(16)}}>시각</Text></View>
+                            <View style={{flex:2,backgroundColor:'blue',justifyContent: 'center',alignItems:'center'}}>
+                                <Select
+                                    onValueChange={(value) => props.selectHour(value)}
+                                    placeholder={{ label: '시간',value :null,color: '#CCCCCC'}}
+                                    style={{flex:1,paddingLeft:15}}
+                                    items={hourItem()}
+                                />
+                            </View>
+                            <View style={{flex:2,backgroundColor:'green',justifyContent: 'center',alignItems:'center'}}>
+                                <Select
+                                    onValueChange={(value) => props.selectMinutes(value)}
+                                    placeholder={{ label: '분',value :null,color: '#CCCCCC'}}
+                                    style={{flex:1,paddingLeft:15}}
+                                    items={minutesItem()}
+                                    useNativeAndroidPickerStyle={false}
+                                />
+                            </View>
+                            <View style={{flex:2,backgroundColor:'yellow',justifyContent: 'center',alignItems:'center'}}>
+                                <Select
+                                    onValueChange={(value) => props.selectMeridiem(value)}
+                                    placeholder={{ label: 'AM,PM',value :null,color: '#CCCCCC'}}
+                                    style={{flex:1,paddingLeft:15}}
+                                    items={[
+                                        {label:'AM',value:'AM'},
+                                        {label:'PM',value:'PM'}
+                                    ]}
+                                />
+                            </View>
+                            {/* <TimePicker onTimeSelected={(date)=>{props.onChange(date)}}/> */}
                         </View>
-                        <View style={styles.modal_button_area}>
+                        <View style={styles.modal_createButton_area}>
                             <Button titleStyle={{color:'black'}} type="clear" title="취소" onPress={()=>props.toggleModalCreateChat()} />
                             <View style={{width:16}}></View>
                             <Button titleStyle={{color:'black'}} type="clear" title="확인" onPress={()=>props.createChattingRoom()} />
                         </View>
                     </View>
                 </View>
+                <View style={{flex:1}}></View>
             </View>
         </Modal>
     )
@@ -244,7 +298,7 @@ function ModalEnterChat(props){
     return (
         <Modal isVisible={props.ModalEnterChatVisible}>
             <View style={styles.modal_enterChat_wrapper}>
-                <View style={{height:230,backgroundColor:'white',padding : 25,borderRadius:10}}>
+                <View style={{height:230,backgroundColor:'white',padding : 25,paddingTop: 0 ,borderRadius:10}}>
                     <View style={styles.modal_title_area}>
                         <Text style={styles.text_modal_title}>동행 요청</Text>
                     </View>
@@ -254,7 +308,7 @@ function ModalEnterChat(props){
                                 <Text style={{fontSize:RFValue(16)}}>출발</Text>
                             </View>
                             <View style={styles.modal_text_wrapper}>
-                                <Text style={{fontSize:RFValue(15),color:'#A6A6A6'}}>출발장소</Text>
+                                <Text style={{fontSize:RFValue(15),color:'#A6A6A6'}}>{props.selectedChattingRoom.startLocation} </Text>
                             </View>
                         </View>
                         <View style={styles.modal_EndLocation_wrapper}>
@@ -262,7 +316,7 @@ function ModalEnterChat(props){
                                 <Text style={{fontSize:RFValue(16)}}>도착</Text>
                             </View>
                             <View style={styles.modal_text_wrapper}>
-                                <Text style={{fontSize:RFValue(15),color:'#A6A6A6'}}>도착장소</Text>
+                                <Text style={{fontSize:RFValue(15),color:'#A6A6A6'}}>{props.selectedChattingRoom.arriveLocation}</Text>
                             </View>
                         </View>
                         <View style={styles.modal_Time_wrapper}>
@@ -293,7 +347,23 @@ class ChattingRoom extends React.Component {
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.sb.connect('익명이', (user, error) => {})
     }
+    getRemainingTime(departureTime){
+        
+    }
 
+    parseTime(timestamp){
+        if(typeof(timestamp)==='string'){
+            return timestamp
+        }
+        const date = new Date(timestamp)
+        const departureTime =  {
+            hour : date.getHours() > 12 ? date.getHours()-12 : date.getHours(),
+            minutes : date.getMinutes(),
+            meridiem : date.getHours() > 12 ? 'PM' : 'AM',
+        }
+        const {hour,minutes,meridiem} = departureTime
+        return `${hour<10 ? '0'+hour: hour}:${minutes} ${meridiem}`
+    }
     render() {
         /*  */
         return(
@@ -325,7 +395,7 @@ class ChattingRoom extends React.Component {
                     <View style={styles.time_area}>
                         <View style={styles.time_wrapper}>
                             <Text style={{color:'red'}}>5분전</Text>
-                            <Text style={{color:'gray'}}>{this.props.channelData.startTime}</Text>
+                            <Text style={{color:'gray'}}>{this.parseTime(this.props.channelData.startTime)}</Text>
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -363,34 +433,42 @@ const styles = StyleSheet.create({
         flexDirection : 'row'
     },
     modal_title_area: {
-        flex:4,
+        flex:2,
         /* backgroundColor:"green", */
-        justifyContent: 'center',
+        marginTop: 30,
+        justifyContent: 'flex-start',
     },
     modal_location_area: {
         flex:5,
         /* backgroundColor:"yellow", */
     },
     modal_time_area: {
-        flex:9,
-        /* backgroundColor:"blue", */
+        flex:5,
+        marginTop: 10
     },
     modal_description_area: {
-        flex:10,
+        flex:5,
         /* backgroundColor:"yellow", */
     },
     modal_last_area: {
-        flex:4,
+        flex:2,
         /* backgroundColor:"blue", */
     },
+    modal_createButton_area: {
+        flex:1,
+        flexDirection: 'row',
+        alignItems: 'flex-end',
+        justifyContent: 'flex-end',
+    },
     modal_button_area: {
-        flex:3,
+        flex:1,
         flexDirection: 'row',
         alignItems: 'flex-end',
         justifyContent: 'flex-end',
     },
     modal_timePicker_wrapper: {
-        flex:6,
+        flex:1,
+        flexDirection: 'row',
     },
     row: {
         height : 100,
@@ -424,6 +502,7 @@ const styles = StyleSheet.create({
     modal_startLocation_wrapper: {
         flex:1,
         flexDirection: 'row',
+        marginBottom: 5,
     },
     modal_EndLocation_wrapper: {
         flex:1,
@@ -495,7 +574,7 @@ const styles = StyleSheet.create({
     },
     modal_wrapper: {
         flex:1,
-        paddingTop: 100,
+        justifyContent: 'center',
         paddingLeft : "10.18%",
         paddingRight : "10.18%",
         borderRadius : 100,

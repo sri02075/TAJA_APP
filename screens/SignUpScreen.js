@@ -1,8 +1,9 @@
 import React,{Component} from 'react'
 import { Image, StyleSheet, Text, TouchableOpacity, View , Keyboard} from 'react-native'
 import { RFPercentage } from "react-native-responsive-fontsize"
-import { Input , Button } from 'react-native-elements'
+import { Input , Button, CheckBox } from 'react-native-elements'
 //import Toast from 'react-native-simple-toast'
+import * as WebBrowser from 'expo-web-browser';
 import axios from 'axios'
 import Spinner from 'react-native-loading-spinner-overlay';
 
@@ -12,10 +13,12 @@ export default class SignupScreen extends Component {
         this.state = {
             formData: {
                 email: '',
+                //verification_code: '',
                 nickname: '',
                 password: '',
                 password_confirm : '',
             },
+            checked: false,
             spinner: false,
             appearKeyboard  : false,
         }
@@ -33,13 +36,18 @@ export default class SignupScreen extends Component {
     }
 
     async handleSignIn(){
-        const {email,nickname,password,password_confirm} = this.state.formData
+        const {email,nickname,password,password_confirm,checked} = this.state.formData
         if(!email || !nickname || !password || !password_confirm){
             alert('정보를 입력해주세요')
             return
         }
+        if(!checked){
+            alert('개인정보 이용동의를 체크해주세요')
+            return
+        }
         if(password !== password_confirm){
             alert('비밀번호가 일치하지 않습니다.')
+            this.setState({password_confirm:''})
             return
         }
         this.setState({spinner:!this.state.spinner})
@@ -63,16 +71,16 @@ export default class SignupScreen extends Component {
                 textContent={'Loading...'}
                 textStyle={{color: '#FFF'}}
             />
-            <View style={styles.logo_area}>
+            <View style={this.state.appearKeyboard ? {display: 'none'} : styles.logo_area}>
             <Image
                 source={require('../assets/images/taja_logo.png')}
                 style={styles.logo_img}
             />
             </View>
-            <View style={styles.title_area}>
+            <View style={this.state.appearKeyboard ? {display: 'none'} : styles.title_area}>
                 <Text style={this.state.appearKeyboard ? {fontSize : 0} : styles.text_signUp}>SIGN UP</Text>
             </View>
-            <View style={this.state.appearKeyboard ? focusInputStyle : styles.input_area}>
+            <View style={this.state.appearKeyboard ? focusInputAreaStyle : styles.input_area}>
                 <Input
                     containerStyle={styles.input_container}
                     inputStyle = {styles.input}
@@ -89,6 +97,22 @@ export default class SignupScreen extends Component {
                         return state
                     })}
                 />
+                {/* <Input
+                    containerStyle={styles.input_container}
+                    inputStyle = {styles.input}
+                    placeholder='Verification Code'
+                    placeholderTextColor="#fff"
+                    errorStyle={{ color: 'red' }}
+                    leftIcon={{ type: 'font-awesome',
+                                name: 'envelope',
+                                color : 'white',
+                                size : 15 }}
+                    errorMessage=''
+                    onChangeText={value => this.setState(state=>{
+                        state.formData.verification_code = value
+                        return state
+                    })}
+                /> */}
                 <Input
                     containerStyle={styles.input_container}
                     inputStyle = {styles.input}
@@ -139,8 +163,23 @@ export default class SignupScreen extends Component {
                         return state
                     })}
                 />
+                <View style={this.state.appearKeyboard ? {display: 'none'} : styles.checkbox_wrapper}>
+                    <CheckBox
+                        containerStyle={{flex:1}}
+                        title=''
+                        size={20}
+                        checkedColor='#ffb000'
+                        checked={this.state.checked}
+                        onPress={() => this.setState({checked: !this.state.checked})}
+                    />
+                    <TouchableOpacity
+                        style={{flex:50}}
+                        onPress={() => WebBrowser.openBrowserAsync('http://policy.taja.awmaker.com/')}>
+                        <Text style={{color : "white", fontSize : RFPercentage(1.4)}}>개인정보 수집 및 이용에 대한 동의 (필수)</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
-            <View style={styles.button_area}>
+            <View style={this.state.appearKeyboard ? {display: 'none'} : styles.button_area}>
                 <Button
                     buttonStyle={styles.button}
                     title="SIGN UP"
@@ -148,7 +187,7 @@ export default class SignupScreen extends Component {
                     onPress ={()=>this.handleSignIn()}
                 />
             </View>
-            <View style={styles.signIn_area}>
+            <View style={this.state.appearKeyboard ? {display: 'none'} : styles.signIn_area}>
                 <Text style={styles.text_signIn}>이미 계정이 있으신가요? </Text>
                 <TouchableOpacity>
                     <Text
@@ -179,12 +218,17 @@ const header = {
     },
 }
 
-const focusInputStyle = {
-    minHeight : 700,
+const focusInputAreaStyle = {
+    height : '60%',
     alignItems : "center",
     paddingLeft : "14.35%",
     paddingRight : "14.35%",
     paddingTop : "15%",
+    //height:
+}
+
+const focusInputStyle ={
+
 }
 const styles = StyleSheet.create({
     container: {
@@ -204,7 +248,7 @@ const styles = StyleSheet.create({
         alignItems : "center",
     },
     input_area : {
-        flex: 7,
+        flex: 8,
         /* backgroundColor : "green", */
         alignItems : "center",
         paddingLeft : "14.35%",
@@ -213,6 +257,7 @@ const styles = StyleSheet.create({
     button_area : {
         flex: 2,
         /* backgroundColor : "white", */
+        marginTop: 30,
         paddingLeft : "16.35%",
         paddingRight : "16.35%",
     },
@@ -234,7 +279,14 @@ const styles = StyleSheet.create({
         paddingTop : "11%",
     },
     input_container : {
+        flex: 1,
         width : "100%",
+    },
+    checkbox_wrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        marginLeft: -10,
     },
     input : {
         color : "white",
