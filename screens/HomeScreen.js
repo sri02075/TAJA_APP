@@ -649,6 +649,6 @@ const styles = StyleSheet.create({
     icon_img: {
         width : '75%',
         height : '60%',
-        resizeMode : 'contain',
+        resizeMode : 'contain', 
     }
 });
