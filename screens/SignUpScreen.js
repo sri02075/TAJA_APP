@@ -36,11 +36,13 @@ export default class SignupScreen extends Component {
     }
 
     async handleSignIn(){
-        const {email,nickname,password,password_confirm,checked} = this.state.formData
+        const {email,nickname,password,password_confirm} = this.state.formData
+        const {checked} = this.state
         if(!email || !nickname || !password || !password_confirm){
             alert('정보를 입력해주세요')
             return
         }
+        console.log(checked)
         if(!checked){
             alert('개인정보 이용동의를 체크해주세요')
             return

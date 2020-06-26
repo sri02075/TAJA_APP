@@ -7,7 +7,8 @@ import Modal from 'react-native-modal';
 import Select from 'react-native-picker-select';
 import { CommonActions } from '@react-navigation/native';
 import SendBird from 'sendbird'
-
+import Spinner from 'react-native-loading-spinner-overlay'
+const today = new Date()
 export default class HomeScreen extends React.Component {
     constructor(props){
         super(props)
@@ -16,15 +17,15 @@ export default class HomeScreen extends React.Component {
             ModalCreateChatVisible : false,
             ModalEnterChatVisible : false,
             appearKeyboard  : false,
-            selectedStartLocation : '',
-            selectedEndLocation : '',
-            selectedHours: 8,
-            selectedMinutes: 30,
-            selectedMeridiem : 'AM',
-            selectedTime : 1593189000000,
+            selectedStartLocation : undefined,
+            selectedEndLocation : undefined,
+            selectedHours: today.getHours() > 12 ? today.getHours()-12 : today.getHours(),
+            selectedMinutes: undefined,
+            selectedMeridiem : today.getHours() < 12 ? 'AM' : 'PM',
             selectedChattingRoom : {},
             chattingRooms : [],
             isRefreshing: true,
+            spinner: false,
         }
 
         const {token,nickname} = this.props.route.params
@@ -42,9 +43,19 @@ export default class HomeScreen extends React.Component {
 
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.sb.connect(this.nickname, (user, error) => {})
-        this.props.navigation.setOptions(header)
     }
     componentDidMount() {
+        const self = this
+        header.headerRight = ()=>(
+            <TouchableOpacity style={{width:50}} onPress={()=>self.handleRefresh()}>
+                <Icon
+                    name="refresh"
+                    size={30}
+                    color="black"
+                />
+            </TouchableOpacity>
+        )
+        this.props.navigation.setOptions(header)
         this.handleRefresh()
     }
     selectStartLocation(location) {
@@ -53,8 +64,8 @@ export default class HomeScreen extends React.Component {
     selectEndLocation(location) {
         this.setState({selectedEndLocation:location})
     }
-    selectHour(selectedHour) {
-        this.setState({selectedHour})
+    selectHour(selectedHours) {
+        this.setState({selectedHours})
     }
     selectMinutes(selectedMinutes) {
         this.setState({selectedMinutes})
@@ -71,44 +82,71 @@ export default class HomeScreen extends React.Component {
             selectedChattingRoom : channelData,
         })
     }
+    parseTime(selectedHours,selectedMinutes,selectedMeridiem) {
+        let today_timestamp = new Date(today.toDateString()).getTime()
+        today_timestamp += 1000 * 60 * 60 * selectedHours
+        today_timestamp += 1000 * 60 * selectedMinutes
+        today_timestamp += selectedMeridiem == 'AM' ?  0 : 1000 * 60 * 60 * 12
+        return today_timestamp
+    }
     createChattingRoom() {
-        const data = {
-            adminName : this.nickname,
-            startTime : this.state.selectedTime,
-            startLocation : this.state.selectedStartLocation,
-            arriveLocation : this.state.selectedEndLocation,
-            isFrozen : false
+        const {selectedStartLocation,selectedEndLocation,selectedHours,selectedMinutes,selectedMeridiem} = this.state
+        if(!selectedStartLocation || !selectedEndLocation){
+            alert('장소를 선택해주세요')
+            return
+        }
+        if(selectedMinutes === undefined) {
+            alert('시간을 설정해주세요')
+            return
+        }
+        
+        this.setState({spinner:!this.state.spinner})
+        const startTime = this.parseTime(selectedHours,selectedMinutes,selectedMeridiem)
+        const curTime = new Date().getTime()
+
+        if(startTime - curTime < (1000 * 60 * 5)){
+            alert('시간이 너무 촉박합니다\n다시 설정해주세요')
+            this.setState({spinner:!this.state.spinner})
+            return
         }
         const This = this
-        this.sb.OpenChannel.createChannel("타이틀", "", JSON.stringify(data), [] ,'', (openChannel, error) => {
+        this.sb.OpenChannel.createChannel("타이틀", "", "", [] ,'', (openChannel, error) => {
             if (error) {
+                this.setState({spinner:!this.state.spinner})
                 return;
             }
-            This.handleRefresh()
-            This.toggleModalCreateChat()
 
-            openChannel.createMetaData(data)
+            const data = {
+                userName : this.nickname,
+                startTime : startTime+'',
+                startLocation : this.state.selectedStartLocation,
+                arriveLocation : this.state.selectedEndLocation,
+                isFrozen : 'false',
+                url: openChannel.url
+            }
+            // console.log(data)
+            //This.handleRefresh()
+            This.toggleModalCreateChat()
+            this.setState({spinner:!this.state.spinner})
+            openChannel.createMetaData(data).then((res)=>{
+                this.props.navigation.navigate('Chat', {channelData: data, myName: this.nickname})
+            })
         })
-        
     }
 
     enterChattingRoom(){
         this.setState({ModalEnterChatVisible : !this.state.ModalEnterChatVisible})
-        this.props.navigation.navigate('Chat', this.state.selectedChattingRoom)
+        this.props.navigation.navigate('Chat', {channelData: this.state.selectedChattingRoom, myName: this.nickname})
     }
 
-    getChattingRooms(){
-        
-    }
 
     renderChattingRooms(){
         return this.state.chattingRooms.map((channelData, idx)=>{
             if(!channelData.url){
                 return <View key={idx} />
             }
-            
             return ((channelData.isFrozen)==='false')
-            ? <ChattingRoom key={idx} channelData={channelData} handlePressList={(channelData)=>this.handlePressList(channelData)} />
+            ? <ChattingRoom key={idx} nickname = {this.nickname} channelData={channelData} handlePressList={(channelData)=>this.handlePressList(channelData)} />
             : <View key={idx} />
         })
     }
@@ -116,21 +154,35 @@ export default class HomeScreen extends React.Component {
     handleRefresh(){
         this.setState({isRefreshing: !this.state.isRefreshing})
         let openChannelListQuery = this.sb.OpenChannel.createOpenChannelListQuery();
-        
         const self=this
 
         this.setState({
             chattingRooms: []
         })
         openChannelListQuery.next((openChannels, error) => {
-            openChannels.forEach((openChannel,idx)=>{
-                openChannel.getAllMetaData((response)=>{
-                    this.setState({
-                        chattingRooms: [...this.state.chattingRooms, response]
+            openChannels.reduce( async (acc,cur)=>{
+                const response = await acc
+                if(response){
+                    self.setState(state=>{
+                        state.chattingRooms.push(response)
+                        return state
+                        //chattingRooms: [...self.state.chattingRooms,response]
                     })
-                })
-            })
-            this.setState({isRefreshing: !this.state.isRefreshing})
+                }
+                return cur.getAllMetaData()
+            },Promise).then(response=>self.setState({
+                chattingRooms: [...self.state.chattingRooms,response]
+            }))
+            /* response data 설명
+                response = {
+                    arriveLocation: "도착시간",
+                    isFrozen: "true or false, 모집완료 유무",
+                    startLocation: "출발 지역",
+                    startTime: "합승 출발 시각",
+                    url: "채널 url",
+                    userName: "사용중인 유저 네임"
+            } */
+            self.setState({isRefreshing: !self.state.isRefreshing})
         })
     }
     toggleModalCreateChat = () => {
@@ -143,7 +195,11 @@ export default class HomeScreen extends React.Component {
     render(){
         return (
             <View style={styles.container}>
-
+                <Spinner
+                    visible={this.state.spinner}
+                    textContent={'Loading...'}
+                    textStyle={{color: '#FFF'}}
+                />
                 <ScrollView refreshControl={<RefreshControl refreshing={!this.state.isRefreshing} onRefresh={()=>this.handleRefresh()} />}>
                     {this.renderChattingRooms()}
                 </ScrollView>
@@ -176,13 +232,16 @@ export default class HomeScreen extends React.Component {
                                     selectStartLocation={(value)=>this.selectStartLocation(value)}
                                     selectEndLocation={(value)=>this.selectEndLocation(value)}
                                     selectHour={(value)=>this.selectHour(value)}
-                                    selectedMinutes={(value)=>this.selectedMinutes(value)}
-                                    selectedMeridiem={(value)=>this.selectedMeridiem(value)}
+                                    selectedHours={this.state.selectedHours}
+                                    selectMinutes={(value)=>this.selectMinutes(value)}
+                                    selectedMinutes={this.state.selectedMinutes}
+                                    selectMeridiem={(value)=>this.selectMeridiem(value)}
+                                    selectedMeridiem={this.state.selectedMeridiem}
                                     createChattingRoom={()=>this.createChattingRoom()}/>
                             </TouchableOpacity>
                         </View>
                         <View style={styles.profile_wrapper}>
-                            <TouchableOpacity style={styles.bottom_icon_wrapper} onPress={() => this.props.navigation.navigate('Profile')}>
+                            <TouchableOpacity style={styles.bottom_icon_wrapper} onPress={() => this.props.navigation.navigate('Profile',this.nickname)}>
                                 <Icon
                                     name="user-o"
                                     size={28}
@@ -198,7 +257,7 @@ export default class HomeScreen extends React.Component {
 function ModalCreateChat(props){
     const hourItem = ()=>{
         const hourItemArray = []
-        for(let i=1; i<=12; i++){
+        for(let i=0; i<=12; i++){
             hourItemArray.push({label: `${i<10 ? '0'+i : i}`, value: i})
         }
         return hourItemArray
@@ -213,21 +272,21 @@ function ModalCreateChat(props){
     return (
         <Modal isVisible={props.ModalCreateChatVisible}>
             <View style={styles.modal_wrapper}>
-                <View style={{flex:1}}></View>
-                <View style={{flex:2,backgroundColor:'white',padding : 25,borderRadius:10}}>
-                    <View style={styles.modal_title_area}>
+                <View style={{flex:6}}></View>
+                <View style={{flex:7,backgroundColor:'white',padding : 25,borderRadius:10}}>
+                    <View style={styles.modal_title_create_area}>
                         <Text style={styles.text_modal_title}>새로운 동행</Text>
                     </View>
                     <View style={styles.modal_location_area}>
-                        <View style={styles.modal_startLocation_wrapper}>
-                            <View style={{flex:1,justifyContent: 'center',alignItems:'center'}}>
+                        <View style={styles.modal_startLocation_create_wrapper}>
+                            <View style={{flex:1,alignItems:'center',justifyContent:'center'}}>
                                 <Text style={{fontSize:RFValue(16)}}>출발</Text>
                             </View>
                             <View style={styles.select_wrapper}>
                                 <Select
                                     onValueChange={(value) => props.selectStartLocation(value)}
                                     placeholder={{ label: '출발장소',value :null,color: '#CCCCCC'}}
-                                    style={{flex:1}}
+                                    //style={}
                                     items={[
                                         { label: '안양역', value: '안양역' },
                                         { label: '안양대 정문', value: '안양대 정문' },
@@ -256,34 +315,36 @@ function ModalCreateChat(props){
                     </View>
                     <View style={styles.modal_time_area}>
                         <View style={styles.modal_timePicker_wrapper}>
-                            <View style={{flex:2,backgroundColor:'red',justifyContent: 'center',alignItems:'center'}}><Text style={{fontSize:RFValue(16)}}>시각</Text></View>
-                            <View style={{flex:2,backgroundColor:'blue',justifyContent: 'center',alignItems:'center'}}>
+                            <View style={{flex:2,justifyContent: 'center',alignItems:'center'}}><Text style={{fontSize:RFValue(16)}}>시각</Text></View>
+                            <View style={{flex:2,justifyContent: 'center',alignItems:'center'}}>
                                 <Select
                                     onValueChange={(value) => props.selectHour(value)}
-                                    placeholder={{ label: '시간',value :null,color: '#CCCCCC'}}
-                                    style={{flex:1,paddingLeft:15}}
+                                    placeholder={{ label: '', value: props.selectedHours ,color: 'white'}}
+                                    style={{}}
                                     items={hourItem()}
                                 />
+                                <Text style={{position: 'absolute',left:10}}>{props.selectedHours < 10 ? '0'+props.selectedHours : props.selectedHours}</Text>
                             </View>
-                            <View style={{flex:2,backgroundColor:'green',justifyContent: 'center',alignItems:'center'}}>
+                            <View style={{flex:2,justifyContent: 'center',alignItems:'center'}}>
                                 <Select
                                     onValueChange={(value) => props.selectMinutes(value)}
-                                    placeholder={{ label: '분',value :null,color: '#CCCCCC'}}
-                                    style={{flex:1,paddingLeft:15}}
+                                    placeholder={{ label: '',value : null,color: 'white'}}
+                                    style={{}}
                                     items={minutesItem()}
-                                    useNativeAndroidPickerStyle={false}
                                 />
+                                <Text style={{position: 'absolute',left:10}}>{props.selectedMinutes}</Text>
                             </View>
-                            <View style={{flex:2,backgroundColor:'yellow',justifyContent: 'center',alignItems:'center'}}>
+                            <View style={{flex:2,justifyContent: 'center',alignItems:'center'}}>
                                 <Select
                                     onValueChange={(value) => props.selectMeridiem(value)}
-                                    placeholder={{ label: 'AM,PM',value :null,color: '#CCCCCC'}}
-                                    style={{flex:1,paddingLeft:15}}
+                                    placeholder={{ label: '',value: props.selectedMeridiem ,color: 'white'}}
+                                    style={{}}
                                     items={[
                                         {label:'AM',value:'AM'},
                                         {label:'PM',value:'PM'}
                                     ]}
                                 />
+                                <Text style={{position: 'absolute',left:5}}>{props.selectedMeridiem}</Text>
                             </View>
                             {/* <TimePicker onTimeSelected={(date)=>{props.onChange(date)}}/> */}
                         </View>
@@ -294,7 +355,7 @@ function ModalCreateChat(props){
                         </View>
                     </View>
                 </View>
-                <View style={{flex:1}}></View>
+                <View style={{flex:6}}></View>
             </View>
         </Modal>
     )
@@ -351,15 +412,41 @@ class ChattingRoom extends React.Component {
     constructor(props){
         super(props)
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
-        this.sb.connect('익명이', (user, error) => {})
+        this.sb.connect(this.props.nickname, (user, error) => {})
+        this.remaingTime = this.getRemainingTime(this.props.channelData.startTime)
     }
     getRemainingTime(departureTime){
-        
+        if(typeof(departureTime) === 'string') {
+            departureTime *=1
+        }
+        let difference = departureTime - new Date().getTime()
+        let hour = 0
+        let minute = 0
+        if(difference <= 0) {
+            return `모집 종료`
+        }
+        while (difference >= 3600000) {
+            hour++
+            difference -= 3600000
+        }
+        while (difference >= 60000) {
+            minute++
+            difference -= 60000
+        }
+        if (hour <= 0) {
+            if (minute <= 0) {
+            return `곧 출발`
+            } else {
+            return `${minute + 1}분 전`
+            }
+        } else {
+            return `${hour}시간\n ${minute + 1}분 전`
+        }
     }
 
     parseTime(timestamp){
         if(typeof(timestamp)==='string'){
-            return timestamp
+            timestamp = timestamp*1
         }
         const date = new Date(timestamp)
         const departureTime =  {
@@ -370,20 +457,23 @@ class ChattingRoom extends React.Component {
         const {hour,minutes,meridiem} = departureTime
         return `${hour<10 ? '0'+hour: hour}:${minutes} ${meridiem}`
     }
+    
     render() {
         /*  */
         return(
             <View style={styles.row}>
-                <TouchableOpacity style={styles.row_wrapper} onPress={()=>this.props.handlePressList(this.props.channelData)} >
+                <TouchableOpacity
+                    style={styles.row_wrapper}
+                    onPress={()=>this.remaingTime !== '모집 종료' ? this.props.handlePressList(this.props.channelData) : null} >
                     <View style={styles.icon_area}>
                         <View style={styles.icon_wrapper}>
                             <Image
-                                source={require('../assets/images/taja_logo.png')}
-                                style={styles.logo_img}
+                                source={require('../assets/images/car.png')}
+                                style={styles.icon_img}
                             />
                         </View>
                         <View styles={{flex:1}}>
-                            <Text style={styles.text_nickname}>택시타자</Text>
+                            <Text style={styles.text_nickname}>{this.props.channelData.userName}</Text>
                         </View>
                     </View>
                     <View style={styles.description_area}>
@@ -400,7 +490,7 @@ class ChattingRoom extends React.Component {
                     </View>
                     <View style={styles.time_area}>
                         <View style={styles.time_wrapper}>
-                            <Text style={{color:'red'}}>5분전</Text>
+                            <Text style={{color:'red'}}> {this.remaingTime}</Text>
                             <Text style={{color:'gray'}}>{this.parseTime(this.props.channelData.startTime)}</Text>
                         </View>
                     </View>
@@ -422,10 +512,6 @@ const header = {
         fontWeight: 'bold',
     },
 }
-HomeScreen.navigationOptions = {
-    header: header,
-};
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -444,13 +530,19 @@ const styles = StyleSheet.create({
         marginTop: 30,
         justifyContent: 'flex-start',
     },
+    modal_title_create_area: {
+        flex:2,
+        /* backgroundColor:"green", */
+        justifyContent: 'flex-start',
+        marginBottom: 10
+    },
     modal_location_area: {
         flex:5,
         /* backgroundColor:"yellow", */
     },
     modal_time_area: {
         flex:5,
-        marginTop: 10
+        marginTop: 10,
     },
     modal_description_area: {
         flex:5,
@@ -506,13 +598,17 @@ const styles = StyleSheet.create({
         paddingTop: 25
     },
     modal_startLocation_wrapper: {
-        flex:1,
         flexDirection: 'row',
-        marginBottom: 5,
+        height : RFValue(28),
+    },
+    modal_startLocation_create_wrapper: {
+        flexDirection: 'row',
+        height : RFValue(28),
+        marginBottom: RFValue(8)
     },
     modal_EndLocation_wrapper: {
-        flex:1,
         flexDirection: 'row',
+        height : RFValue(28),
     },
     modal_Time_wrapper: {
         flex:1,
@@ -520,7 +616,7 @@ const styles = StyleSheet.create({
     },
     modal_text_wrapper: {
         flex:3,
-        justifyContent:'center'
+        justifyContent:'center',
     },
     description: {
         flex : 2,
@@ -595,10 +691,12 @@ const styles = StyleSheet.create({
     select_wrapper: {
         flex:3,
         borderWidth: 1,
-        marginTop:8,
         justifyContent:'center',
+        alignItems: 'center',
         borderRadius:4,
-        borderColor:'#dcdcdc'
+        borderColor:'#dcdcdc',
+        height : RFValue(28),
+        paddingLeft: RFValue(12)
     },
     icon_wrapper: {
         flex: 5,
@@ -612,7 +710,7 @@ const styles = StyleSheet.create({
     },
     icon_img: {
         width : '75%',
-        height : '60%',
+        height : '75%',
         resizeMode : 'contain',
     }
-});
+})
