@@ -12,13 +12,16 @@ export default class ChatScreen extends React.Component {
     constructor(props){
         super(props)
         const self = this
-        this.channelData = this.props.route.params
-        console.log('-------------------start--------------------------')
-        console.log(this.props.route.params)
+        const Data = this.props.route.params
+
+        this.channelData = Data.channelData
+        this.myName = Data.myName
+        
+        console.log(this.myName)
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.channelHandler = new this.sb.ChannelHandler()
-        console.log(this.channelData.userName)
-        this.sb.connect(this.channelData.userName, (user, error) => {})
+        
+        this.sb.connect(this.myName, (user, error) => {})
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
                 return
@@ -28,7 +31,6 @@ export default class ChatScreen extends React.Component {
                 if (error) {
                     return
                 }
-                self.setState({ user_count: self.channel.participantCount })
             })
         })
 
@@ -41,7 +43,6 @@ export default class ChatScreen extends React.Component {
             isFrozen: false,
             isModalVisible: false,
             selectedModal: 0,
-
             payList : [],
             user_count: 0,
         }
@@ -50,29 +51,35 @@ export default class ChatScreen extends React.Component {
             self.chatRefresh()
         }
         this.channelHandler.onUserEntered = (channel, message) => {
-            self.setState({ memberNum: self.channel.participantCount })
             channel.getMetaData(["userList"],(response, error) => {
-                console.log(self.channelData.userName)
                 if(response.userList==null){
-                    self.channel.createMetaData({userList: JSON.stringify({userList: [self.channelData.userName]})})
-                    self.setState({ userList: [self.channelData.userName] })
+                    self.channel.createMetaData({userList: JSON.stringify({userList: [self.myName]})})
+                    self.setState({
+                        members: [self.myName],
+                        user_count: 1
+                    })
                 } else {
                     const userList = JSON.parse(response.userList).userList
-                    if(!userList.includes(self.channelData.userName)){
-                        console.log(`${response.userList}_${self.channelData.userName}`)
-                        
-                        self.channel.updateMetaData({userList: JSON.stringify({userList: [...userList, self.channelData.userName]})})
+                    if(!userList.includes(self.myName)){
+                        self.setState({ members: [...userList, self.myName],
+                            user_count: userList.length+1,
+                        })
+                        self.channel.updateMetaData({userList: JSON.stringify({userList: [...userList, self.myName]})})
+                    } else {
+                        self.setState({ members: [...this.state.members, self.myName],
+                            user_count: userList.length+1,
+                        })
                     }
-                }  
+                }
             })
         }
-        this.channelHandler.onUserExited = function(channel, message) {
-            console.log(message)
-            // self.setState({
-            //     members: [...self.state.members, ]
-            // })
-            channel.participantCount
-        }
+        // this.channelHandler.onUserExited = function(channel, message) {
+        //     console.log(message)
+        //     // self.setState({
+        //     //     members: [...self.state.members, ]
+        //     // })
+        //     channel.participantCount
+        // }
         this.sb.addChannelHandler("UNIQUE_KEY", this.channelHandler)
         BackHandler.addEventListener('hardwareBackPress', () => {
             if(self.state.isPlus){
@@ -106,7 +113,7 @@ export default class ChatScreen extends React.Component {
                 }
                 self.state.chatHistory.push({
                     profileLogo: '',
-                    name: self.channelData.userName,
+                    name: self.myName,
                     contents: message.message,
                     timeStamp: message.createdAt
                 })
@@ -222,7 +229,7 @@ export default class ChatScreen extends React.Component {
 
     onContentSizeChangeHandler() {
         if(this.state.chatHistory.length>0){
-            if(this.state.chatHistory[this.state.chatHistory.length-1].name===this.channelData.userName){
+            if(this.state.chatHistory[this.state.chatHistory.length-1].name===this.myName){
                 this.scrollview.scrollToEnd({animated: true})
             }
         }
@@ -242,7 +249,7 @@ export default class ChatScreen extends React.Component {
 
     renderChat() {
         return this.state.chatHistory.map((chat,idx) =>{
-            return (this.channelData.userName===chat.name) ?
+            return (this.myName===chat.name) ?
             <ChatContentByMe key={idx} contents={chat.contents} time={this.convertTimeStamp(chat.timeStamp)} /> :
             <ChatContentByOther key={idx} name={chat.name} contents={chat.contents} icon={this.state.defaultIcon} time={this.convertTimeStamp(chat.timeStamp)} />
         })
@@ -308,7 +315,19 @@ export default class ChatScreen extends React.Component {
     }
 
     renderMember(){
-        return <View/>
+        let arr = []
+        for(let i=0; i<this.state.members.length; i++){
+            arr.push(<Profile isVisible={true} text={this.state.members[i]}/>)
+        }
+        for(let i=this.state.members.length; i<4; i++){
+            arr.push(<Profile isVisible={false} text={"꽃강아지"}/>)
+        }
+        console.log(arr)
+        return(
+            <View style={styles.member_wrapper}>
+                {arr}
+            </View>
+        )
     }
     calculatePay(pay,user_count){
         const result = []
@@ -331,12 +350,7 @@ export default class ChatScreen extends React.Component {
                     <View style={styles.member_icon_wrapper}>
                         <Image style={styles.member_icon} source={require('../assets/images/member.png')}/>
                     </View>
-                    <View style={styles.member_wrapper}>
-                        <Profile text={"최대8자까지된다"}/>
-                        <Profile text={"혼자타고싶어요"}/>
-                        <Profile text={"아저씨"}/>
-                        <Profile text={"꽃강아지"}/>
-                    </View>
+                    {this.renderMember()}
                     <View style={styles.spread_icon_wrapper}>
                         <Image style={styles.spread_icon} source={require('../assets/images/spread.png')}/>
                     </View>
@@ -379,16 +393,23 @@ class Profile extends React.Component {
         super(props)
     }
     render() {
-        return(
-            <View style={styles.profile_wrapper}>
-                <View style={styles.profile_icon_wrapper}>
-                    <Image style={styles.profile_icon} source={require('../assets/images/default_profile.png')}/>
+        if(this.props.isVisible){
+            return(
+                <View style={styles.profile_wrapper}>
+                    <View style={styles.profile_icon_wrapper}>
+                        <Image style={styles.profile_icon} source={require('../assets/images/default_profile.png')}/>
+                    </View>
+                    <View style={styles.profile_text_wrapper}>
+                        <Text style={styles.profile_text}>{this.props.text}</Text>
+                    </View>
                 </View>
-                <View style={styles.profile_text_wrapper}>
-                    <Text style={styles.profile_text}>{this.props.text}</Text>
-                </View>
-            </View>
-        )
+            )
+        }
+        else{
+            return(
+                <View style={styles.profile_wrapper} />
+            )
+        }
     }
 }
 
@@ -706,7 +727,7 @@ const styles = StyleSheet.create({
         marginHorizontal: '2%'
     },
     chat_area: {
-        paddingVertical : 30
+        paddingBottom : 30
     },
     icon_wrapper: {
         width: '20%',
