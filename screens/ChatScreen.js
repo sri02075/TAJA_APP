@@ -12,13 +12,15 @@ export default class ChatScreen extends React.Component {
     constructor(props){
         super(props)
         const self = this
-        this.channelData = this.props.route.params
-        console.log('-------------------start--------------------------')
-        console.log(this.props.route.params)
+        const Data = this.props.route.params
+        this.channelData = Data.channelData
+        this.myName = Data.myName
+        
+        console.log(this.myName)
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.channelHandler = new this.sb.ChannelHandler()
-        console.log(this.channelData.userName)
-        this.sb.connect(this.channelData.userName, (user, error) => {})
+        
+        this.sb.connect(this.myName, (user, error) => {})
         this.sb.OpenChannel.getChannel(this.channelData.url, function(openChannel, error) {
             if (error) {
                 return
@@ -49,30 +51,30 @@ export default class ChatScreen extends React.Component {
         this.channelHandler.onMessageReceived = (channel, message) => {
             self.chatRefresh()
         }
-        this.channelHandler.onUserEntered = (channel, message) => {
-            self.setState({ memberNum: self.channel.participantCount })
-            channel.getMetaData(["userList"],(response, error) => {
-                console.log(self.channelData.userName)
-                if(response.userList==null){
-                    self.channel.createMetaData({userList: JSON.stringify({userList: [self.channelData.userName]})})
-                    self.setState({ userList: [self.channelData.userName] })
-                } else {
-                    const userList = JSON.parse(response.userList).userList
-                    if(!userList.includes(self.channelData.userName)){
-                        console.log(`${response.userList}_${self.channelData.userName}`)
+        // this.channelHandler.onUserEntered = (channel, message) => {
+        //     self.setState({ memberNum: self.channel.participantCount })
+        //     channel.getMetaData(["userList"],(response, error) => {
+        //         console.log(self.channelData.userName)
+        //         if(response.userList==null){
+        //             self.channel.createMetaData({userList: JSON.stringify({userList: [self.channelData.userName]})})
+        //             self.setState({ userList: [self.channelData.userName] })
+        //         } else {
+        //             const userList = JSON.parse(response.userList).userList
+        //             if(!userList.includes(self.channelData.userName)){
+        //                 console.log(`${response.userList}_${self.channelData.userName}`)
                         
-                        self.channel.updateMetaData({userList: JSON.stringify({userList: [...userList, self.channelData.userName]})})
-                    }
-                }  
-            })
-        }
-        this.channelHandler.onUserExited = function(channel, message) {
-            console.log(message)
-            // self.setState({
-            //     members: [...self.state.members, ]
-            // })
-            channel.participantCount
-        }
+        //                 self.channel.updateMetaData({userList: JSON.stringify({userList: [...userList, self.channelData.userName]})})
+        //             }
+        //         }  
+        //     })
+        // }
+        // this.channelHandler.onUserExited = function(channel, message) {
+        //     console.log(message)
+        //     // self.setState({
+        //     //     members: [...self.state.members, ]
+        //     // })
+        //     channel.participantCount
+        // }
         this.sb.addChannelHandler("UNIQUE_KEY", this.channelHandler)
         BackHandler.addEventListener('hardwareBackPress', () => {
             if(self.state.isPlus){
@@ -106,7 +108,7 @@ export default class ChatScreen extends React.Component {
                 }
                 self.state.chatHistory.push({
                     profileLogo: '',
-                    name: self.channelData.userName,
+                    name: self.myName,
                     contents: message.message,
                     timeStamp: message.createdAt
                 })
@@ -222,7 +224,7 @@ export default class ChatScreen extends React.Component {
 
     onContentSizeChangeHandler() {
         if(this.state.chatHistory.length>0){
-            if(this.state.chatHistory[this.state.chatHistory.length-1].name===this.channelData.userName){
+            if(this.state.chatHistory[this.state.chatHistory.length-1].name===this.myName){
                 this.scrollview.scrollToEnd({animated: true})
             }
         }
@@ -242,7 +244,7 @@ export default class ChatScreen extends React.Component {
 
     renderChat() {
         return this.state.chatHistory.map((chat,idx) =>{
-            return (this.channelData.userName===chat.name) ?
+            return (this.myName===chat.name) ?
             <ChatContentByMe key={idx} contents={chat.contents} time={this.convertTimeStamp(chat.timeStamp)} /> :
             <ChatContentByOther key={idx} name={chat.name} contents={chat.contents} icon={this.state.defaultIcon} time={this.convertTimeStamp(chat.timeStamp)} />
         })
