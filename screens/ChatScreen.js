@@ -304,7 +304,7 @@ export default class ChatScreen extends React.Component {
                 user_count={this.state.user_count}
                 changePayList = {(payList)=>this.setState({payList:payList},()=>{this.sendCustomMessage(this.getDutchPayMessage());cancle()})}
                 ok={() => {cancle()}}
-                text={"더치페이"} />,
+                text={"더치 페이"} />,
             <ModalConfirm
                 isVisible={(this.state.isModalVisible) && (this.state.selectedModal==3)}
                 isType={1}
