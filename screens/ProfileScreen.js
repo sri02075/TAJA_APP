@@ -1,8 +1,9 @@
 import Icon from 'react-native-vector-icons/FontAwesome'
 import * as React from 'react'
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, Image, TouchableOpacity,BackHandler } from 'react-native'
 import { Button } from 'react-native-elements'
 import { RFValue } from "react-native-responsive-fontsize"
+import { CommonActions } from '@react-navigation/native';
 import Modal from 'react-native-modal'
 
 
@@ -13,6 +14,12 @@ export default class ProfileScreen extends React.Component {
             isModalVisible: false,
             selected: 0,
         }
+        const self = this
+        BackHandler.addEventListener('hardwareBackPress', () => {
+            self.props.navigation.dispatch(
+                CommonActions.goBack()
+            )
+        })
     }
     componentDidMount() {
         this.props.navigation.setOptions(header)

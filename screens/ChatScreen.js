@@ -460,7 +460,12 @@ class ModalConfirm extends React.Component {
             <Modal isVisible={this.props.isVisible}>
                 <View style={styles.modal_enterChat_wrapper}>
                     <View style={{height: this.props.isType == 1 ? 150 : 230,backgroundColor:'white',padding : 25,borderRadius:10}}>
-                        <ModalConTents isType={this.props.isType} text={this.props.text} input_pay={this.input_pay} onChangeText={(value)=>this.setState({totalPay:value})}/>
+                        <ModalConTents 
+                            isType={this.props.isType}
+                            text={this.props.text}
+                            input_pay={this.input_pay}
+                            user_count={this.props.user_count}
+                            onChangeText={(value)=>this.setState({totalPay:value})}/>
                         <View style={styles.modal_last_area}>
                             <View style={styles.modal_button_area}>
                                 <Button titleStyle={{color:'black'}} type="clear" title="취소" onPress={()=>this.props.cancle()} />
@@ -477,8 +482,6 @@ class ModalConfirm extends React.Component {
 
 class ModalConTents extends React.Component {
     render() {
-        
-
         if(this.props.isType==1){
             return(
                 <View style={styles.modal_content_area}>
@@ -496,14 +499,14 @@ class ModalConTents extends React.Component {
                             <View style={styles.modal_input_area}>
                                 <Input
                                     ref={this.props.input_pay}
-                                    containerStyle={{flex:1,justifyContent:'center',alignItems:'center',backgroundColor:'yellow'}}
+                                    containerStyle={{flex:1,justifyContent:'center',alignItems:'center'}}
                                     inputContainerStyle={{borderBottomWidth:0,alignItems:'center',justifyContent:'center'}}
                                     inputStyle={{alignItems:'flex-end',justifyContent:'center',fontSize: RFValue(20),color:'gray'}}
                                     onChangeText={(value)=>this.props.onChangeText(value)}/>
                                 <Text style={{fontSize:RFValue(20)}}>원</Text>
                             </View>
                             <View style={styles.modal_input_info_area}>
-                                <Text style={{fontSize:RFValue(20)}}>/ 4명</Text>
+                                <Text style={{fontSize:RFValue(20)}}>{`/ ${this.props.user_count}명`}</Text>
                             </View>
                         </View>
                     </View>
@@ -830,7 +833,7 @@ const styles = StyleSheet.create({
     },
     modal_content_wrapper: {
         flex:4,
-        backgroundColor: 'red'
+        /* backgroundColor: 'red' */
     },
     modal_content_area: {
         flex:1,
@@ -838,7 +841,7 @@ const styles = StyleSheet.create({
     },
     modal_input_area: {
         flex:3,
-        backgroundColor: 'purple',
+        /* backgroundColor: 'purple', */
         flexDirection:'row',
         alignItems: 'center'
     },
@@ -851,7 +854,7 @@ const styles = StyleSheet.create({
     modal_input_wrapper: {
         flex: 5,
         flexDirection: 'row',
-        backgroundColor: 'green',
+        /* backgroundColor: 'green', */
         alignItems: 'center',
         justifyContent: 'center'
     },
@@ -859,7 +862,7 @@ const styles = StyleSheet.create({
         flex:1,
         paddingRight: "10%",
         paddingLeft: "10%",
-        backgroundColor: 'blue',
+        /* backgroundColor: 'blue', */
         borderBottomWidth: 1,
         flexDirection: 'row',
         justifyContent: 'center',
