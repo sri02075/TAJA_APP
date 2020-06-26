@@ -477,8 +477,6 @@ class ModalConfirm extends React.Component {
 
 class ModalConTents extends React.Component {
     render() {
-        
-
         if(this.props.isType==1){
             return(
                 <View style={styles.modal_content_area}>
@@ -516,33 +514,36 @@ class ModalConTents extends React.Component {
 class PlusCollection extends React.Component {
     render() {
         return(
-            <View style={styles.btn_wrapper}>
-                <TouchableOpacity style={styles.btn_gallery_wrapper} onPress={()=>{this.props.funcArr[0]()}} >
-                    <View style={styles.btn_gallery_icon_wrapper}>
-                        <Image style={styles.btn_gallery} source={require('../assets/images/gallary.png')} />
-                    </View>
-                    <View style={styles.btn_gallery_text_wrapper}>
-                        <Text style={styles.btn_gallery_text}>갤러리</Text>
-                    </View>
-                </TouchableOpacity>
-                <View style={styles.bar} />
-                <TouchableOpacity style={styles.btn_dutch_wrapper} onPress={()=>{this.props.funcArr[1]()}} >
-                    <View style={styles.btn_dutch_icon_wrapper}>
-                        <Image style={styles.btn_dutch} source={require('../assets/images/coin.png')} />
-                    </View>
-                    <View style={styles.btn_dutch_text_wrapper}>
-                        <Text style={styles.btn_dutch_text}>더치페이</Text>
-                    </View>
-                </TouchableOpacity>
-                <View style={styles.bar} />
-                <TouchableOpacity style={styles.btn_endInvite_wrapper} onPress={()=>{this.props.funcArr[2]()}} >
-                    <View style={styles.btn_endInvite_icon_wrapper}>
-                        <Image style={styles.btn_endInvite} source={require('../assets/images/stop.png')} />
-                    </View>
-                    <View style={styles.btn_endInvite_text_wrapper}>
-                        <Text style={styles.btn_endInvite_text}>모집종료</Text>
-                    </View>
-                </TouchableOpacity>
+            <View>
+                <View style={styles.btn_wrapper}>
+                    <TouchableOpacity style={styles.btn_gallery_wrapper} onPress={()=>{this.props.funcArr[0]()}} >
+                        <View style={styles.btn_gallery_icon_wrapper}>
+                            <Image style={styles.btn_gallery} source={require('../assets/images/gallary.png')} />
+                        </View>
+                        <View style={styles.btn_gallery_text_wrapper}>
+                            <Text style={styles.btn_gallery_text}>갤러리</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <View style={styles.bar} />
+                    <TouchableOpacity style={styles.btn_dutch_wrapper} onPress={()=>{this.props.funcArr[1]()}} >
+                        <View style={styles.btn_dutch_icon_wrapper}>
+                            <Image style={styles.btn_dutch} source={require('../assets/images/coin.png')} />
+                        </View>
+                        <View style={styles.btn_dutch_text_wrapper}>
+                            <Text style={styles.btn_dutch_text}>더치페이</Text>
+                        </View>
+                    </TouchableOpacity>
+                    <View style={styles.bar} />
+                    <TouchableOpacity style={styles.btn_endInvite_wrapper} onPress={()=>{this.props.funcArr[2]()}} >
+                        <View style={styles.btn_endInvite_icon_wrapper}>
+                            <Image style={styles.btn_endInvite} source={require('../assets/images/stop.png')} />
+                        </View>
+                        <View style={styles.btn_endInvite_text_wrapper}>
+                            <Text style={styles.btn_endInvite_text}>모집종료</Text>
+                        </View>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.underBar}/>
             </View>
         )
     }
@@ -868,7 +869,6 @@ const styles = StyleSheet.create({
     btn_wrapper: {
         width: '100%',
         height: 68,
-        marginBottom: 10,
         borderTopLeftRadius: 8,
         borderTopRightRadius: 8,
         flexDirection: 'row',
@@ -883,8 +883,6 @@ const styles = StyleSheet.create({
         marginTop: '7.821%',
         marginBottom: '5.027%',
         height: '42.011%',
-        borderColor: 'black',
-        borderWidth: 1,
     },
     btn_gallery:{
         width: '100%',
@@ -895,8 +893,10 @@ const styles = StyleSheet.create({
         marginLeft: '41.061%',
         marginRight: '41.34%',
         width: '17.877%',
-        borderColor: 'black',
-        borderWidth: 1
+        alignItems: 'center'
+    },
+    btn_gallery_text:{
+        fontSize: 8,
     },
     btn_dutch_wrapper:{
         width: '33.148%',
@@ -907,9 +907,7 @@ const styles = StyleSheet.create({
         width: '25.418%',
         marginTop: '7.821%', //28
         marginBottom: '4.748%', //17
-        height: '42.011%', //71
-        borderColor: 'black',
-        borderWidth: 1,
+        height: '42.011%',
     },
     btn_dutch:{
         width: '100%',
@@ -920,12 +918,11 @@ const styles = StyleSheet.create({
         marginLeft: '37.15%',
         marginRight: '37.43%',
         width: '25.418%',
-        borderColor: 'black',
-        borderWidth: 1,
+        alignItems: 'center'
     },
-    // btn_dutch_text:{
-    //     sd,
-    // },
+    btn_dutch_text:{
+        fontSize: 8,
+    },
     btn_endInvite_wrapper:{
         width: '33.148%',
     },
@@ -936,8 +933,6 @@ const styles = StyleSheet.create({
         marginTop: '6.983%',
         marginBottom: '7.262%',
         height: '44.97%',
-        borderColor: 'black',
-        borderWidth: 1,
     },
     btn_endInvite: {
         width: '100%',
@@ -948,12 +943,11 @@ const styles = StyleSheet.create({
         marginLeft: '38.368%',
         marginRight: '35.474%',
         width: '26.256%',
-        borderColor: 'black',
-        borderWidth: 1,
+        alignItems: 'center'
     },
-    // btn_endInvite_text: {
-    //     sds,
-    // },
+    btn_endInvite_text:{
+        fontSize: 8,
+    },
     bar: {
         width: '0.185%', //2
         marginTop: '3.055%', //33
@@ -963,7 +957,7 @@ const styles = StyleSheet.create({
     },
     underBar: {
         width: '100%', //2
-        height: '59.763%',//101
+        height: 2,//101
         backgroundColor: "#CCCCCC",
     },
 })
