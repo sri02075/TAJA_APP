@@ -170,9 +170,13 @@ export default class HomeScreen extends React.Component {
                     })
                 }
                 return cur.getAllMetaData()
-            },Promise).then(response=>self.setState({
-                chattingRooms: [...self.state.chattingRooms,response]
-            }))
+            },Promise).then(response=>{
+                if(response){
+                    self.setState({
+                        chattingRooms: [...self.state.chattingRooms,response]
+                    })
+                }
+            })
             /* response data 설명
                 response = {
                     arriveLocation: "도착시간",

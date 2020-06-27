@@ -31,7 +31,6 @@ export default class LoginScreen extends Component {
                     })
                 }
             }catch(err){
-                console.log(err)
             }
         }
         checkJWT()

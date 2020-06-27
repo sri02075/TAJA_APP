@@ -13,7 +13,7 @@ export default class ProfileScreen extends React.Component {
         this.state = {
             isModalVisible: false,
             selected: 0,
-        }        
+        }
         const self = this
         BackHandler.addEventListener('hardwareBackPress', () => {
             self.props.navigation.dispatch(

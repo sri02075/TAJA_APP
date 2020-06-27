@@ -24,7 +24,6 @@ export default class SignupScreen extends Component {
         }
     }
     componentDidMount(){
-        console.log(this.props.route,this.props.navigation)
         this.props.navigation.setOptions(header)
         this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', ()=>this.setState({appearKeyboard : true}))
         this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', ()=>this.setState({appearKeyboard : false}))
@@ -42,7 +41,6 @@ export default class SignupScreen extends Component {
             alert('정보를 입력해주세요')
             return
         }
-        console.log(checked)
         if(!checked){
             alert('개인정보 이용동의를 체크해주세요')
             return

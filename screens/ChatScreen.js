@@ -17,7 +17,6 @@ export default class ChatScreen extends React.Component {
         this.channelData = Data.channelData
         this.myName = Data.myName
         
-        console.log(this.myName)
         this.sb = new SendBird({appId: '27B3D61B-004E-4DB6-9523-D45CCD63EDFD'})
         this.channelHandler = new this.sb.ChannelHandler()
         
@@ -322,7 +321,6 @@ export default class ChatScreen extends React.Component {
         for(let i=this.state.members.length; i<4; i++){
             arr.push(<Profile isVisible={false} text={"꽃강아지"}/>)
         }
-        console.log(arr)
         return(
             <View style={styles.member_wrapper}>
                 {arr}
@@ -360,7 +358,7 @@ export default class ChatScreen extends React.Component {
                     syle={{transform: [{ scaleY: -1 }]}}
                     ref={ref => this.scrollview = ref}
                     style={styles.chat_area}
-                    onContentSizeChange={this.onContentSizeChangeHandler.bind(this)} 
+                    onContentSizeChange={this.onContentSizeChangeHandler.bind(this)}
                 >
                     <View>{this.renderChat()}</View>
                 </ScrollView>
@@ -434,7 +432,6 @@ class ModalConfirm extends React.Component {
                 return
             }
             const payList =this.calculatePay(this.state.totalPay,this.props.user_count)
-            console.log(JSON.stringify(payList))
             this.props.changePayList(payList)
             this.input_pay.current.clear()
 
