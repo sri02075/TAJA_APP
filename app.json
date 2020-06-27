@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "TAJA_APP",
-    "slug": "TAJA_APP",
+    "name": "TAJA",
+    "slug": "TAJA",
     "platforms": [
       "ios",
       "android",
